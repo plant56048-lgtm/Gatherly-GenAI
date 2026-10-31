@@ -1,0 +1,3523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10231e" />
+  <meta name="description" content="Gatherly — GenAI-powered celebration and event planning assistant with deterministic budgets, dated timelines, vendor diligence, and conversational refinement." />
+  <title>Gatherly — AI Event Planning Assistant</title>
+  <style>
+    :root {
+      --ink: #14211d;
+      --muted: #5e6f68;
+      --cream: #f7f5ef;
+      --paper: #fffefa;
+      --line: #dfe5dd;
+      --sage: #dce8d8;
+      --leaf: #155e47;
+      --leaf-hover: #0e4433;
+      --leaf-light: #e8f2ea;
+      --coral: #e66e55;
+      --coral-light: #faece8;
+      --gold: #d99a26;
+      --gold-light: #fef7e6;
+      --shadow: 0 16px 40px rgba(20, 33, 29, 0.08);
+      --shadow-sm: 0 4px 12px rgba(20, 33, 29, 0.05);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 85% 5%, #e7f1e1 0, transparent 28rem), var(--cream);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--leaf);
+      outline-offset: 2px;
+    }
+
+    .shell {
+      width: min(1340px, calc(100% - 32px));
+      margin: auto;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 0 16px;
+      border-bottom: 1px solid rgba(21, 94, 71, 0.12);
+      margin-bottom: 24px;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand {
+      font-family: Georgia, serif;
+      font-size: 29px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .brand b { color: var(--leaf); }
+    .tag {
+      background: var(--sage);
+      color: var(--leaf);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Badges & Buttons */
+    .btn-sm {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-sm:hover {
+      background: #fff;
+      border-color: var(--leaf);
+      color: var(--leaf);
+    }
+    .model-badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: #ebf5ee;
+      border: 1px solid #c7e3cb;
+      border-radius: 999px;
+      color: var(--leaf);
+      font-weight: 700;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 36px;
+      padding: 18px 0 32px;
+    }
+    h1 {
+      font: 500 clamp(34px, 4.5vw, 56px) / 1.05 Georgia, serif;
+      margin: 0 0 14px;
+      letter-spacing: -1.5px;
+    }
+    h1 em {
+      color: var(--leaf);
+      font-style: italic;
+    }
+    .lead {
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 18px;
+    }
+    .quick-demos {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .quick-demos span {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .demo-chip {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--leaf);
+      transition: all 0.15s ease;
+    }
+    .demo-chip:hover {
+      background: var(--leaf);
+      color: #fff;
+      border-color: var(--leaf);
+    }
+
+    .hero-card {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .hero-card .spark {
+      color: #e3eecc;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .hero-card h2 {
+      font: 400 22px / 1.3 Georgia, serif;
+      margin: 10px 0 16px;
+      color: #fdfefe;
+    }
+    .hero-card .mini {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 14px;
+      color: #d1dcda;
+      font-size: 13px;
+    }
+    .hero-card .dot {
+      height: 9px;
+      width: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* Layout: 3 Columns (Inputs, Plan Canvas, Chat Assistant) */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 254, 250, 0.95);
+      border: 1px solid rgba(223, 229, 221, 0.9);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .sticky-panel {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+    }
+
+    /* Form Styles */
+    .form-card h2 {
+      font: 500 23px Georgia, serif;
+      margin: 0 0 4px;
+      letter-spacing: -0.5px;
+    }
+    .form-card .sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #3b4b45;
+      margin: 12px 0 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
+      font-size: 13.5px;
+      color: var(--ink);
+      transition: border 0.15s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--leaf);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 56px;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .disclosure {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      background: #fafbf9;
+    }
+    .disclosure summary {
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--leaf);
+      user-select: none;
+    }
+    .disclosure-body {
+      padding-top: 8px;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .chk-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      color: var(--ink);
+    }
+    .chk-item input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--leaf);
+      margin: 0;
+    }
+    .primary-btn {
+      border: 0;
+      border-radius: 10px;
+      width: 100%;
+      padding: 12px 16px;
+      margin-top: 16px;
+      background: var(--leaf);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .primary-btn:hover {
+      background: var(--leaf-hover);
+      transform: translateY(-1px);
+    }
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Chat Assistant Panel */
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 32px);
+      padding: 18px;
+    }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
+    }
+    .chat-header h3 {
+      font: 500 17px Georgia, serif;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chat-status {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #eaf3ec;
+      color: var(--leaf);
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 4px;
+      font-size: 13px;
+    }
+    .msg {
+      padding: 9px 12px;
+      border-radius: 12px;
+      max-width: 88%;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: var(--leaf);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: #edf3ee;
+      color: var(--ink);
+      border-bottom-left-radius: 2px;
+      border: 1px solid #dbe6dc;
+    }
+    .msg.system {
+      align-self: center;
+      background: #fff;
+      border: 1px dashed var(--line);
+      font-size: 11.5px;
+      color: var(--muted);
+      text-align: center;
+      max-width: 100%;
+    }
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 10px 0 8px;
+    }
+    .prompt-chip {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11.5px;
+      color: #3b5047;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .prompt-chip:hover {
+      background: var(--leaf-light);
+      border-color: var(--leaf);
+      color: var(--leaf);
+    }
+    .chat-form {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+    .chat-send {
+      background: var(--leaf);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* Plan Canvas */
+    .plan-canvas {
+      min-height: 600px;
+    }
+    .empty-state {
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon {
+      font-size: 52px;
+      color: var(--leaf);
+      margin-bottom: 14px;
+    }
+    .empty-state h3 {
+      font: 500 24px Georgia, serif;
+      color: var(--ink);
+      margin: 0 0 8px;
+    }
+    .empty-state p {
+      max-width: 420px;
+      margin: 0 0 20px;
+      font-size: 14px;
+    }
+
+    /* Plan Elements */
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+    .plan-header h2 {
+      font: 500 clamp(24px, 3vw, 32px) Georgia, serif;
+      margin: 4px 0 8px;
+      letter-spacing: -0.5px;
+      color: var(--ink);
+    }
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .source-badge.ai {
+      background: #e6f4ea;
+      color: #137333;
+      border: 1px solid #ceead6;
+    }
+    .source-badge.demo {
+      background: #fef7e0;
+      color: #b06000;
+      border: 1px solid #fce8b2;
+    }
+    .source-badge.offline {
+      background: #f1f3f4;
+      color: #5f6368;
+      border: 1px solid #dadce0;
+    }
+    .plan-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .meta-tag {
+      background: #f0f4f0;
+      color: var(--ink);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Alerts */
+    .alert-banner {
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .alert-banner.warning {
+      background: var(--gold-light);
+      border: 1px solid #f5dd99;
+      color: #7a4f04;
+    }
+    .alert-banner.danger {
+      background: var(--coral-light);
+      border: 1px solid #f5c4b8;
+      color: #8c2411;
+    }
+    .alert-banner.info {
+      background: var(--leaf-light);
+      border: 1px solid #c7e3cb;
+      color: var(--leaf);
+    }
+
+    /* Section Headers */
+    .section-title {
+      font: 500 19px Georgia, serif;
+      margin: 24px 0 12px;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-subtitle {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: -8px 0 14px;
+    }
+
+    /* Budget Section */
+    .budget-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #fafbf8;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .stat-card small {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .stat-card strong {
+      font-size: 18px;
+      color: var(--leaf);
+      font-family: Georgia, serif;
+    }
+
+    /* SVG Chart & Table Container */
+    .budget-visual-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 20px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-box {
+      text-align: center;
+    }
+    .chart-box svg {
+      width: 140px;
+      height: 140px;
+      transform: rotate(-90deg);
+    }
+    .chart-box circle {
+      fill: none;
+      stroke-width: 22;
+      transition: stroke-dasharray 0.3s ease;
+    }
+    .chart-box small {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .budget-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .budget-table th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .budget-table td {
+      padding: 8px 8px;
+      border-bottom: 1px solid #f0f2ee;
+      vertical-align: middle;
+    }
+    .budget-table tr:last-child td {
+      border-bottom: 0;
+    }
+    .budget-table .cat-color {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 6px;
+    }
+    .budget-table input.actual-input {
+      width: 95px;
+      padding: 4px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+      text-align: right;
+    }
+    .progress-bar-bg {
+      height: 5px;
+      background: #eef2ec;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    /* Timeline Section */
+    .timeline-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .tab-btn.active {
+      background: var(--leaf);
+      color: #fff;
+      border-color: var(--leaf);
+    }
+    .timeline-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .timeline-item {
+      position: relative;
+      padding: 0 0 16px 22px;
+      border-left: 2px solid var(--sage);
+      transition: background-color 0.4s ease;
+    }
+    .timeline-item:last-child {
+      border-left: 2px solid transparent;
+      padding-bottom: 0;
+    }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--leaf);
+      border: 2px solid #fff;
+    }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+    .timeline-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--ink);
+    }
+    .timeline-date {
+      font-size: 11.5px;
+      color: var(--leaf);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .timeline-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Vendor Diligence Section */
+    .vendor-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .vendor-card {
+      background: #fafbf8;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: border 0.15s ease, background-color 0.4s ease;
+    }
+    .vendor-card:hover {
+      border-color: #b7c7b8;
+    }
+    .vendor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .vendor-category {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .vendor-range {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--leaf);
+      background: #eef6f0;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .vendor-why {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .vendor-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid #eef2ec;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .vendor-details-col strong {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .vendor-details-col.ask strong { color: var(--leaf); }
+    .vendor-details-col.flags strong { color: var(--coral); }
+    .vendor-details-col ul {
+      margin: 0;
+      padding-left: 16px;
+      color: #3b4b45;
+    }
+    .vendor-details-col li {
+      margin-bottom: 3px;
+      line-height: 1.35;
+    }
+    .vendor-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .vendor-status-select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+    }
+    .vendor-notes-input {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    /* Ideas Section */
+    .ideas-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .idea-tab-btn {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4b5d56;
+    }
+    .idea-tab-btn.active {
+      background: var(--coral-light);
+      border-color: var(--coral);
+      color: var(--coral);
+    }
+    .ideas-cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .idea-card {
+      background: #fff;
+      border: 1px solid #eef2ec;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #243530;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.4s ease;
+    }
+    .idea-card small {
+      display: block;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--leaf);
+      margin-bottom: 4px;
+    }
+
+    /* Action Footer */
+    .actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* Changed Item Fine-Grained Highlight Animation */
+    @keyframes highlightPill {
+      0% { background-color: #d1ecd6; outline: 2px solid var(--leaf); }
+      70% { background-color: #e4f5e8; outline: 2px solid var(--leaf); }
+      100% { background-color: transparent; outline: 2px solid transparent; }
+    }
+    .just-updated {
+      animation: highlightPill 2s ease-out;
+      border-radius: 6px;
+    }
+
+    /* Modal / Dialog */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(16, 35, 30, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      width: min(480px, 100%);
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-header h3 {
+      font: 500 20px Georgia, serif;
+      margin: 0;
+    }
+    .close-btn {
+      background: transparent;
+      border: 0;
+      font-size: 20px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.2s ease;
+      z-index: 2000;
+      max-width: min(450px, calc(100vw - 48px));
+      word-break: break-word;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      header, .hero, .form-card, .chat-panel, .actions-bar,
+      .quick-prompts, .modal-overlay, .toast, .no-print {
+        display: none !important;
+      }
+      .shell {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .app-layout {
+        display: block !important;
+      }
+      .card {
+        box-shadow: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+      }
+      .plan-canvas {
+        min-height: auto !important;
+      }
+      .budget-visual-grid {
+        border: 1px solid #ccc !important;
+      }
+      .vendor-card, .idea-card {
+        break-inside: avoid;
+        border: 1px solid #ccc !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .app-layout {
+        grid-template-columns: 320px 1fr;
+      }
+      .chat-panel {
+        grid-column: 1 / -1;
+        height: 480px;
+      }
+    }
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 10px;
+        gap: 20px;
+      }
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      .sticky-panel {
+        position: static;
+        max-height: none;
+      }
+      .budget-visual-grid {
+        grid-template-columns: 1fr;
+      }
+      .vendor-details-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Header -->
+    <header>
+      <div class="brand-wrap">
+        <a href="#" class="brand" aria-label="Gatherly Home">gather<b>ly</b></a>
+        <span class="tag">AI Celebration Co-Planner</span>
+      </div>
+      <div class="header-actions">
+        <span class="model-badge" id="currentModelBadge" title="Active Model">Model: gemini-2.5-flash</span>
+        <button class="btn-sm" id="openSettingsBtn" aria-haspopup="dialog" aria-label="Configure Gemini API Settings">
+          ⚙ API Settings
+        </button>
+        <button class="btn-sm" id="quickDemoBtn" aria-label="Load demo plan">
+          ★ Try Demo
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" aria-label="Introduction">
+      <div>
+        <h1>Make room for the <em>moment.</em></h1>
+        <p class="lead">
+          An intelligent, grounded co-planner that balances realistic budgets, thoughtful timelines, and vendor diligence for celebrations that feel truly personal.
+        </p>
+        <div class="quick-demos" role="group" aria-label="Pre-generated demo plans">
+          <span>Try realistic demos:</span>
+          <button class="demo-chip" data-demo="wedding">Jaipur Royal Wedding (₹15L)</button>
+          <button class="demo-chip" data-demo="birthday">30th Terrace Soirée (₹1.2L)</button>
+          <button class="demo-chip" data-demo="community">Eco Harvest Fair (₹3.5L)</button>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <div class="spark">Planning Principle</div>
+        <h2>Build the experience around your people — not the Pinterest board.</h2>
+        <div class="mini">
+          <span class="dot"></span>
+          <span>Includes buffer time, accessibility prompts &amp; contingency thinking.</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Main 3-Column Layout -->
+    <main class="app-layout">
+      <!-- Left Column: Input Form (Progressive Disclosure) -->
+      <section class="card form-card sticky-panel" aria-label="Event Configuration">
+        <h2>Plan an event</h2>
+        <p class="sub">Set the essentials. Fine-tune anytime via the chat co-planner.</p>
+
+        <form id="eventForm" novalidate>
+          <label for="eventType">What are you celebrating?</label>
+          <select id="eventType" required>
+            <option value="Wedding">Wedding Celebration</option>
+            <option value="Birthday" selected>Birthday Soirée</option>
+            <option value="Community">Community Gathering</option>
+            <option value="Anniversary">Anniversary Celebration</option>
+            <option value="Other">Custom Social Event</option>
+          </select>
+
+          <label for="eventSubType">Event Sub-Type / Occasion</label>
+          <input id="eventSubType" placeholder="e.g. Milestone 30th Birthday, Sangeet & Reception" value="Milestone 30th Birthday" />
+
+          <div class="two-col">
+            <div>
+              <label for="guests">Guests</label>
+              <input id="guests" type="number" min="1" max="50000" value="45" required />
+            </div>
+            <div>
+              <label for="budget">Total Budget (₹)</label>
+              <input id="budget" type="number" min="0" step="1000" value="120000" required />
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label for="date">Event Date</label>
+              <input id="date" type="date" required />
+            </div>
+            <div>
+              <label for="location">City / Area</label>
+              <input id="location" placeholder="e.g. Bengaluru" value="Bengaluru" required />
+            </div>
+          </div>
+
+          <label for="vibe">Core Vibe &amp; Atmosphere</label>
+          <textarea id="vibe" placeholder="e.g. Cozy rooftop sunset, warm acoustic music, candlelit dinner">Cozy terrace garden, warm fairy lights, artisan cocktails, relaxed acoustic music</textarea>
+
+          <!-- Progressive Disclosure for Detailed Preferences -->
+          <details class="disclosure" id="advancedPrefs">
+            <summary>Custom Preferences &amp; Diligence</summary>
+            <div class="disclosure-body">
+              <label for="culturalStyle">Cultural / Regional Style (Optional)</label>
+              <input id="culturalStyle" placeholder="e.g. Contemporary Urban, South Indian, Minimalist" value="Contemporary Urban Boho" />
+
+              <label for="dietary">Dietary Requirements</label>
+              <input id="dietary" placeholder="e.g. Vegetarian, Jain friendly, 100% Vegan, nut-free" value="Gourmet vegetarian & vegan appetizers, mocktails" />
+
+              <div class="two-col">
+                <div>
+                  <label for="indoorOutdoor">Setting</label>
+                  <select id="indoorOutdoor">
+                    <option value="Outdoor Lawn / Terrace">Outdoor / Terrace</option>
+                    <option value="Indoor Banquet">Indoor Banquet</option>
+                    <option value="Hybrid Indoor/Outdoor">Hybrid</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="duration">Duration</label>
+                  <select id="duration">
+                    <option value="Evening (4-5 hours)">Evening (4-5 hrs)</option>
+                    <option value="Full Day (8 hours)">Full Day (8 hrs)</option>
+                    <option value="Multi-day (2-3 days)">Multi-day (2-3 days)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top: 10px;">
+                <label class="chk-item">
+                  <input type="checkbox" id="venueBooked" />
+                  <span>Venue already booked?</span>
+                </label>
+              </div>
+
+              <label>Top 3 Priorities</label>
+              <div class="checkbox-group">
+                <label class="chk-item"><input type="checkbox" name="priority" value="Food & Drinks" checked /> Food &amp; Hospitality</label>
+                <label class="chk-item"><input type="checkbox" name="priority" value="Atmosphere & Decor" checked /> Atmosphere &amp; Aesthetic</label>
+                <label class="chk-item"><input type="checkbox" name="priority" value="Music & Entertainment" checked /> Music &amp; Entertainment</label>
+                <label class="chk-item"><input type="checkbox" name="priority" value="Photography & Memories" /> Photography &amp; Memories</label>
+                <label class="chk-item"><input type="checkbox" name="priority" value="Staying Strictly Within Budget" /> Strict Budget Discipline</label>
+              </div>
+            </div>
+          </details>
+
+          <button class="primary-btn" type="submit" id="generatePlanBtn">
+            <span>Generate Plan ✦</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Center Column: Generated Plan Canvas -->
+      <section class="card plan-canvas" id="planCanvas" aria-live="polite" aria-label="Generated Event Plan">
+        <!-- Empty / Starter State -->
+        <div class="empty-state" id="emptyState">
+          <div class="icon">✽</div>
+          <h3>Your celebration, thoughtfully organized.</h3>
+          <p>
+            Choose a demo template above or submit the details on the left. The assistant will construct a deterministic budget, a dated milestone timeline, vendor diligence cards, and personalized ideas.
+          </p>
+          <button class="btn-sm" onclick="loadDemoPlan('birthday')">Load 30th Birthday Demo ✦</button>
+        </div>
+
+        <!-- Populated Plan Content (Hidden until plan is loaded) -->
+        <div id="planContent" style="display: none;">
+          <!-- Plan Header -->
+          <div class="plan-header" id="planHeaderArea">
+            <div>
+              <div id="sourceBadgeContainer"></div>
+              <h2 id="planTitleDisplay"></h2>
+              <div class="plan-meta" id="planMetaContainer"></div>
+            </div>
+            <div style="text-align: right;">
+              <div class="meta-tag" id="costPerGuestBadge" style="font-size: 13px; font-weight: 700; color: var(--leaf);"></div>
+              <small id="dateDistanceText" style="display: block; color: var(--muted); margin-top: 4px;"></small>
+            </div>
+          </div>
+
+          <!-- Realism / Notice Alert Banner -->
+          <div id="alertBannerArea"></div>
+
+          <!-- Executive Strategy Box -->
+          <div class="alert-banner info" id="planSummaryBox">
+            <div>
+              <strong style="color: var(--leaf); display: block; margin-bottom: 3px;">Executive Strategy:</strong>
+              <span id="planSummaryText"></span>
+              <div style="margin-top: 6px; font-size: 12px; color: #2e4d3e;" id="planContingencyText"></div>
+            </div>
+          </div>
+
+          <!-- Deterministic Budget Engine Section -->
+          <div class="section-title">
+            <span>Deterministic Budget Allocation</span>
+            <small style="font-size: 12px; color: var(--muted); font-family: -apple-system, sans-serif;">All prices are strictly estimates</small>
+          </div>
+          <p class="section-subtitle">
+            AI recommends weighted percentages; our mathematical engine guarantees total equals your budget to the exact rupee.
+          </p>
+
+          <div class="budget-summary-grid">
+            <div class="stat-card">
+              <small>Planned Total</small>
+              <strong id="statPlannedBudget">₹0</strong>
+            </div>
+            <div class="stat-card">
+              <small>Actual Spent</small>
+              <strong id="statActualSpend" style="color: #243530;">₹0</strong>
+            </div>
+            <div class="stat-card">
+              <small>Variance / Remaining</small>
+              <strong id="statBudgetVariance" style="color: #137333;">₹0</strong>
+            </div>
+          </div>
+
+          <div class="budget-visual-grid" id="budgetVisualContainer">
+            <div class="chart-box">
+              <svg viewBox="0 0 100 100" id="budgetDonutSvg" aria-label="Budget Breakdown Chart"></svg>
+              <small>Category Share</small>
+            </div>
+            <div>
+              <table class="budget-table" aria-label="Budget breakdown table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th style="text-align: right;">Allocation</th>
+                    <th style="text-align: right;">Actual (₹)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="budgetTableBody"></tbody>
+              </table>
+              <div id="budgetNormalizationNoteArea"></div>
+            </div>
+          </div>
+
+          <!-- Real Timeline Engine Section -->
+          <div class="section-title">
+            <span>Dated Milestone Timeline</span>
+            <button class="btn-sm" id="downloadIcsBtn" title="Export to Google Calendar / Outlook">📅 Download .ics</button>
+          </div>
+          <p class="section-subtitle">
+            Calculated backward from your event date with proportional lead time scaling.
+          </p>
+
+          <div class="timeline-tabs" role="tablist" aria-label="Timeline Phases">
+            <button class="tab-btn active" data-phase="ALL">All Milestones</button>
+            <button class="tab-btn" data-phase="Plan">1. Plan</button>
+            <button class="tab-btn" data-phase="Book">2. Book</button>
+            <button class="tab-btn" data-phase="Confirm">3. Confirm</button>
+            <button class="tab-btn" data-phase="Event day">4. Event Day</button>
+          </div>
+          <ol class="timeline-list" id="timelineListContainer"></ol>
+
+          <!-- Useful Vendor Diligence Checklist -->
+          <div class="section-title">
+            <span>Vendor Diligence &amp; Checklist</span>
+            <small style="font-size: 12px; color: var(--muted); font-family: -apple-system, sans-serif;">Auto-saved to browser storage</small>
+          </div>
+          <p class="section-subtitle">
+            Essential questions to ask and red flags to watch out for before signing agreements.
+          </p>
+          <div class="vendor-grid" id="vendorGridContainer"></div>
+
+          <!-- Categorized Personalized Ideas Section -->
+          <div class="section-title">
+            <span>Curated Creative Concepts</span>
+            <button class="btn-sm" id="regenerateIdeasBtn" title="Regenerate only this ideas section">✦ Refresh Ideas</button>
+          </div>
+          <p class="section-subtitle">
+            Tailored touches matching your specific vibe, dietary preferences, and cultural style.
+          </p>
+          <div class="ideas-tabs" id="ideasTabPills"></div>
+          <div class="ideas-cards-container" id="ideasCardsGrid"></div>
+
+          <!-- Actions & Export Bar -->
+          <div class="actions-bar no-print">
+            <button class="btn-sm" id="printPlanBtn">🖨 Print Plan</button>
+            <button class="btn-sm" id="copyCleanTextBtn">📋 Copy Clean Text</button>
+            <button class="btn-sm" id="downloadJsonBtn">💾 Download JSON</button>
+            <button class="btn-sm" id="shareLinkBtn">🔗 Copy Share Link</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Co-Planner Chat Assistant -->
+      <aside class="card chat-panel sticky-panel" aria-label="AI Co-Planner Chat">
+        <div class="chat-header">
+          <h3>
+            <span>Co-Planner Chat</span>
+          </h3>
+          <span class="chat-status" id="chatStatusBadge">Ready</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessagesStream" aria-live="polite">
+          <div class="msg system">
+            Ask for adjustments like <em>"make it 15% cheaper"</em>, <em>"add Jain menu"</em>, <em>"change to 70 guests"</em>, or <em>"move date to next month"</em>.
+          </div>
+        </div>
+
+        <div class="quick-prompts" aria-label="Suggested prompts">
+          <button class="prompt-chip" data-prompt="Make the overall plan 15% cheaper">Make it 15% cheaper</button>
+          <button class="prompt-chip" data-prompt="Add strict Jain friendly menu options">Add Jain menu</button>
+          <button class="prompt-chip" data-prompt="Add 100% plant-based vegan options">Add Vegan menu</button>
+          <button class="prompt-chip" data-prompt="Change guest count to 60">60 guests</button>
+          <button class="prompt-chip" data-prompt="Venue is booked">Venue booked</button>
+          <button class="prompt-chip" data-prompt="Add a vendor: Live Saxophonist">Add Saxophonist</button>
+        </div>
+
+        <form class="chat-form" id="chatForm">
+          <input
+            type="text"
+            class="chat-input"
+            id="chatInput"
+            placeholder="Tell your co-planner what to change…"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="chat-send" id="chatSendBtn">Send</button>
+        </form>
+      </aside>
+    </main>
+  </div>
+
+  <!-- API Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="settingsModalTitle">Gemini API &amp; Model Settings</h3>
+        <button class="close-btn" id="closeSettingsBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">
+        Your API key is stored strictly in your browser session/storage and sent via the secure <code>x-goog-api-key</code> header directly to Google's Gemini endpoint.
+      </p>
+
+      <label for="apiKeyInput">Google Gemini API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off" />
+
+      <label for="modelNameInput">Configured Gemini Model ID</label>
+      <input type="text" id="modelNameInput" value="gemini-2.5-flash" />
+      <small style="display: block; font-size: 11px; color: var(--muted); margin-top: 4px;">
+        Default model: <strong>gemini-2.5-flash</strong>. You can change this to any supported Gemini model ID (e.g. gemini-1.5-flash, gemini-2.0-flash).
+      </small>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+        <button class="btn-sm" id="testConnectionBtn" type="button">Test Connection</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-sm" id="clearKeyBtn" type="button">Clear Key</button>
+          <button class="primary-btn" id="saveSettingsBtn" style="width: auto; margin-top: 0; padding: 8px 16px;">
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast" id="toastMessage" role="status"></div>
+
+<script>
+/**
+ * Gatherly — GenAI Celebration & Event Planner
+ * Single-file Vanilla JS Architecture
+ * 
+ * Modules:
+ * 1. Global State & Constants (Standard Gemini Model ID, Keys, Storage)
+ * 2. Structured JSON Schemas & Prompts (Gemini Structured Outputs with newBudget, newGuests, newDate)
+ * 3. Deterministic Budget Engine (Treats 0 as 0, drops invalid categories, normalizes sums, preserves actual spend)
+ * 4. Realistic Timeline Engine (Scales by event-type lead time denominator, enforces order, never dates before today)
+ * 5. Pre-generated Demo Plans (Wedding, Birthday, Community)
+ * 6. Gemini REST Client (x-goog-api-key header, model in error toast, connection test)
+ * 7. Rendering & Honest UI (Fine-grained diffing of changed elements)
+ * 8. Chat Assistant Refinement Loop (Offline intents: vegan vs Jain, guest count, date shift, add vendor)
+ * 9. Storage, Strict Schema Sanitization & Export (Security validated, ICS, Print, Hash)
+ */
+
+// ==========================================
+// 1. GLOBAL STATE & CONSTANTS
+// ==========================================
+const CONFIG = {
+  DEFAULT_MODEL: 'gemini-2.5-flash',
+  TIMEOUT_MS: 30000,
+  STORAGE_KEY_PLAN: 'gatherly_plan_state',
+  STORAGE_KEY_API_KEY: 'gatherly_gemini_key',
+  STORAGE_KEY_MODEL: 'gatherly_model_name'
+};
+
+let MODEL = localStorage.getItem(CONFIG.STORAGE_KEY_MODEL) || CONFIG.DEFAULT_MODEL;
+let API_KEY = localStorage.getItem(CONFIG.STORAGE_KEY_API_KEY) || '';
+
+// Primary Reactive State Object
+let currentPlan = null;
+let activeTimelinePhase = 'ALL';
+let activeIdeasCategory = 'theme';
+
+// ==========================================
+// 2. PRE-GENERATED REALISTIC DEMO PLANS
+// ==========================================
+const DEMO_PLANS = {
+  birthday: {
+    id: 'demo_birthday_30th',
+    source: 'demo',
+    title: "Aarav's 30th Terrace Soirée: Warm Minimalist Dinner",
+    eventType: 'Birthday',
+    eventSubType: 'Milestone 30th Birthday',
+    culturalStyle: 'Contemporary Urban Chic',
+    guests: 45,
+    budget: 120000,
+    date: getRelativeDateString(28),
+    location: 'Bengaluru (Indiranagar)',
+    venueBooked: false,
+    duration: 'Evening (5 hours)',
+    indoorOutdoor: 'Outdoor Lawn / Terrace',
+    dietary: 'Artisan vegetarian & vegan tapas, zero-proof mocktail bar',
+    priorities: ['Atmosphere & Aesthetic', 'Food & Hospitality', 'Music & Entertainment'],
+    costPerGuest: 2667,
+    realismWarning: null,
+    summary: 'An intimate, high-vibe rooftop gathering for 45 close friends featuring Mediterranean tapas, warm festoon lighting, acoustic soundscapes, and an interactive polaroid memory nook.',
+    contingencyNote: 'A safe 8% buffer (₹9,600) is kept for weather tarps and last-minute sound extension permits.',
+    budgetBreakdown: [
+      { id: 'b1', category: 'Food & Tapas Catering', percentage: 35, estimatedAmount: 42000, actualAmount: 0, notes: 'Est. ₹933/guest for 6 live hot appetizers, mezze platters, and mini dessert jars.' },
+      { id: 'b2', category: 'Terrace Venue Hire', percentage: 22, estimatedAmount: 26400, actualAmount: 0, notes: 'Private open rooftop terrace rental including clean restrooms and generator backup.' },
+      { id: 'b3', category: 'Lighting, Decor & Furniture', percentage: 17, estimatedAmount: 20400, actualAmount: 0, notes: 'Warm festoon canopies, low bohemian wooden floor tables, throw pillows, and dried pampas.' },
+      { id: 'b4', category: 'Beverages & Mocktail Mixologist', percentage: 10, estimatedAmount: 12000, actualAmount: 0, notes: 'Custom botanical sodas, cold-pressed juices, ice, and glassware rental.' },
+      { id: 'b5', category: 'Acoustic Sound & Music', percentage: 8, estimatedAmount: 9600, actualAmount: 0, notes: 'Two outdoor powered PA speakers, Bluetooth receiver, and wireless mic for speeches.' },
+      { id: 'b6', category: 'Contingency & Incidentals', percentage: 8, estimatedAmount: 9600, actualAmount: 0, notes: 'Rain canopy contingency, extra ice, and late-night cleanup tips.' }
+    ],
+    timeline: [
+      { id: 't1', phase: 'Plan', offsetDaysBefore: 28, timeframe: '4 weeks out', task: 'Lock Venue & Concept', details: 'Finalize terrace agreement with noise curfew clearance till 10:30 PM. Send digital save-the-dates.' },
+      { id: 't2', phase: 'Book', offsetDaysBefore: 21, timeframe: '3 weeks out', task: 'Book Catering & Sound', details: 'Confirm mezze catering tasting and lock acoustic speaker delivery.' },
+      { id: 't3', phase: 'Confirm', offsetDaysBefore: 10, timeframe: '10 days out', task: 'RSVP Cutoff & Furniture Count', details: 'Lock headcount at 45. Confirm rug/pillow rental quantities and ice block delivery.' },
+      { id: 't4', phase: 'Confirm', offsetDaysBefore: 3, timeframe: '3 days out', task: 'Playlist & Drink Batching', details: 'Download offline Spotify playlist. Confirm welcome signage and customized polaroid tags.' },
+      { id: 't5', phase: 'Event day', offsetDaysBefore: 0, timeframe: 'Event Day (3:00 PM)', task: 'Terrace Setup & Sound Check', details: 'Complete lighting test at dusk, chill beverages, and conduct 30-min setup buffer before guests arrive.' }
+    ],
+    vendors: [
+      {
+        id: 'v1',
+        category: 'Rooftop Venue Coordinator',
+        whyNeeded: 'Ensures terrace access, freight elevator clearance, and electrical stability for lights.',
+        estimatedRange: '₹22,000 – ₹28,000',
+        questionsToAsk: ['Is there freight elevator access for catering setup?', 'What is the strict decibel and curfew limit?', 'Is a commercial kitchen prep area available?'],
+        redFlags: ['No commercial kitchen water connection', 'Sudden hidden corkage or electricity surcharge', 'No rain shelter backup'],
+        status: 'Quoted',
+        notes: 'Contacted Indiranagar rooftop; awaiting signed agreement.'
+      },
+      {
+        id: 'v2',
+        category: 'Live Mezze & Tapas Caterer',
+        whyNeeded: 'High-touch food experience with quick rotation suitable for cocktail mingling.',
+        estimatedRange: '₹38,000 – ₹45,000',
+        questionsToAsk: ['Do you provide heating equipment and bio-degradable tableware?', 'Are dedicated servers included in the quote?'],
+        redFlags: ['Unclear staff-to-guest ratio (< 1 server per 15 guests)', 'Refusal to detail hot food warmers'],
+        status: 'To contact',
+        notes: 'Shortlisted Olive & Thyme catering.'
+      },
+      {
+        id: 'v3',
+        category: 'Acoustic Sound Equipment Rental',
+        whyNeeded: 'Crisp sound across open terrace without distorting or disturbing neighbors.',
+        estimatedRange: '₹8,000 – ₹11,000',
+        questionsToAsk: ['Are weather-proof cables and direct line-in inputs provided?', 'Is on-call technician support available?'],
+        redFlags: ['Underpowered single bluetooth speaker for 45 people', 'Frayed electrical cabling'],
+        status: 'Booked',
+        notes: 'Booked SoundCrafters for delivery at 2:30 PM.'
+      }
+    ],
+    ideas: {
+      theme: ['Warm Minimalist Boho Sunset', 'Botanical Terracotta & Olive'],
+      decor: ['Warm festoon overhead light canopy', 'Low brass bowls with floating marigolds & tea lights', 'Foliage photo nook with customized wooden monogram'],
+      menu: ['Herb-crusted paneer skewers with mint labneh', 'Truffle mushroom flatbreads', 'Passionfruit & rosemary botanical mocktails', 'Salted caramel tartlets'],
+      activities: ['Instant Polaroid memory wall with handwritten guest notes', 'Lighthearted 15-minute roast & toast session', 'Acoustic golden-hour song circle'],
+      returnGifts: ['Mini artisanal succulent pots with personalized calligraphed thank-you tags', 'Single-origin filter coffee bean sachets'],
+      playlist: ['Upbeat acoustic indie folk transitioning to sunset deep melodic house at 8:00 PM'],
+      accessibility: ['Confirm elevator access to 4th-floor terrace for older guests', 'Provide sturdy high-backed bench seating alongside floor cushions']
+    }
+  },
+  wedding: {
+    id: 'demo_wedding_jaipur',
+    source: 'demo',
+    title: 'Ananya & Kabir: Heritage Sangeet & Wedding Celebration',
+    eventType: 'Wedding',
+    eventSubType: 'Sangeet & Reception',
+    culturalStyle: 'Rajasthani Royal Contemporary',
+    guests: 250,
+    budget: 1500000,
+    date: getRelativeDateString(180),
+    location: 'Jaipur',
+    venueBooked: true,
+    duration: 'Full Day (8 hours)',
+    indoorOutdoor: 'Hybrid Indoor/Outdoor',
+    dietary: 'Rich vegetarian feast, authentic Rajasthani Dal Baati counter & live Chaat',
+    priorities: ['Food & Hospitality', 'Atmosphere & Decor', 'Photography & Memories'],
+    costPerGuest: 6000,
+    realismWarning: null,
+    summary: 'A 250-guest royal celebration balancing timeless Rajput architecture with contemporary hospitality. Generous budget allocation for authentic cuisine, choreographed sangeet production, and timeless photography.',
+    contingencyNote: 'Dedicated 8% emergency contingency (₹1,20,000) reserved for sound extension fees and surprise guest additions.',
+    budgetBreakdown: [
+      { id: 'w1', category: 'Catering & Hospitality Feasts', percentage: 34, estimatedAmount: 510000, actualAmount: 0, notes: 'Est. ₹2,040/guest for multi-course royal feast, live chaat galli, and sweet counters.' },
+      { id: 'w2', category: 'Venue, Lawn & Heritage Courtyard', percentage: 22, estimatedAmount: 330000, actualAmount: 330000, notes: 'Booked heritage haveli lawn and banquet hall with 11 PM music permission.' },
+      { id: 'w3', category: 'Decor, Mandap & Stage Lighting', percentage: 18, estimatedAmount: 270000, actualAmount: 0, notes: 'Fresh tuberose (rajnigandha), brass URLI fountains, royal canopies, and stage illumination.' },
+      { id: 'w4', category: 'Photography & Cinematic Video', percentage: 10, estimatedAmount: 150000, actualAmount: 0, notes: '2 candid photographers, 2 cinematographers, drone coverage, and teaser video.' },
+      { id: 'w5', category: 'Sangeet Sound, DJ & Stage Truss', percentage: 8, estimatedAmount: 120000, actualAmount: 0, notes: 'Professional DJ, stage trusses, wireless lapel & handheld mics, and LED backdrop.' },
+      { id: 'w6', category: 'Contingency & Unforeseen Reserve', percentage: 8, estimatedAmount: 120000, actualAmount: 0, notes: 'Unallocated buffer to guarantee zero stress from vendor overruns.' }
+    ],
+    timeline: [
+      { id: 'wt1', phase: 'Plan', offsetDaysBefore: 180, timeframe: '6 months out', task: 'Lock Venue & Core Budget', details: 'Confirm heritage venue contract, pay deposit, and secure room blocks for out-of-town relatives.' },
+      { id: 'wt2', phase: 'Book', offsetDaysBefore: 120, timeframe: '4 months out', task: 'Engage Decorator & Photo Team', details: 'Review moodboards for Sangeet dance stage and book photo team for pre-wedding rituals.' },
+      { id: 'wt3', phase: 'Book', offsetDaysBefore: 60, timeframe: '2 months out', task: 'Food Tastings & Digital Invites', details: 'Sample royal thali courses. Dispatch personalized digital video invitations with RSVP links.' },
+      { id: 'wt4', phase: 'Confirm', offsetDaysBefore: 14, timeframe: '2 weeks out', task: 'Final Guest Count & Run-Sheet', details: 'Freeze catering count at 250. Finalize minute-by-minute sangeet dance cue sheet with DJ.' },
+      { id: 'wt5', phase: 'Event day', offsetDaysBefore: 0, timeframe: 'Event Day', task: 'Execution & Ceremony Coordination', details: '3-hour decor handover buffer at 1:00 PM. Welcome dhol artists and family coordinator run-through.' }
+    ],
+    vendors: [
+      {
+        id: 'wv1',
+        category: 'Heritage Haveli Banqueting Lead',
+        whyNeeded: 'Coordinates electrical load for heavy stage lighting and guest parking valet.',
+        estimatedRange: '₹3,00,000 – ₹3,50,000',
+        questionsToAsk: ['Are outside decorators allowed without royalty fees?', 'What is the cutoff hour for outdoor loudspeakers?'],
+        redFlags: ['No dedicated backup generator in peak summer/festive season', 'Ambiguous kitchen utility surcharges'],
+        status: 'Booked',
+        notes: 'Deposit paid to Haveli Manager on 15th.'
+      },
+      {
+        id: 'wv2',
+        category: 'Authentic Royal Caterers',
+        whyNeeded: 'Signature culinary experience is the highest priority for Indian wedding guests.',
+        estimatedRange: '₹4,80,000 – ₹5,40,000',
+        questionsToAsk: ['Do you handle live cooking stations with proper ventilation?', 'How do you preserve hot food during extended ceremony hours?'],
+        redFlags: ['Limited tasting portions offered beforehand', 'Vague contract regarding server uniform standards'],
+        status: 'Quoted',
+        notes: 'Tasting scheduled for next weekend.'
+      }
+    ],
+    ideas: {
+      theme: ['Royal Marigold & Mint Palace Elegance', 'Mughal Garden Twilight'],
+      decor: ['Cascading fresh genda (marigold) drops with brass lanterns', 'Low diwan seating with block-printed bolsters for elders', 'Fairy light ceiling across the main dinner courtyard'],
+      menu: ['Jodhpuri kachori chaat counter', 'Slow-cooked Dal Baati Churma with five ghee varieties', 'Paan shot welcome cooler', 'Warm kesar jalebi with rabri'],
+      activities: ['Groom vs Bride choreographed dance battle', 'Live Lakh bangle artisan making custom gifts on-site for women guests', 'Traditional puppet show corner for children'],
+      returnGifts: ['Handcrafted blue pottery jars containing organic wild honey and saffron threads'],
+      playlist: ['Live Shehnai and Santoor welcome, transitioning into celebratory Bollywood brass beats'],
+      accessibility: ['Ramped entrance to the main stage and step-free access to dining courtyard', 'Dedicated golf cart transfer for grandparents']
+    }
+  },
+  community: {
+    id: 'demo_community_fair',
+    source: 'demo',
+    title: 'Pune Green Harvest: Community Eco-Fair & Cultural Mela',
+    eventType: 'Community',
+    eventSubType: 'Eco Festival & Market',
+    culturalStyle: 'Sustainable Eco-Conscious Local',
+    guests: 600,
+    budget: 350000,
+    date: getRelativeDateString(45),
+    location: 'Pune (Model Colony Grounds)',
+    venueBooked: false,
+    duration: 'Full Day (8 hours)',
+    indoorOutdoor: 'Outdoor Lawn / Terrace',
+    dietary: 'Local organic millets, street-food stalls, zero single-use plastic',
+    priorities: ['Atmosphere & Decor', 'Food & Hospitality', 'Strict Budget Discipline'],
+    costPerGuest: 583,
+    realismWarning: null,
+    summary: 'A public-spirited gathering celebrating local farmers, artisans, and green living. Built around zero-waste practices, volunteer coordination, and affordable communal joy.',
+    contingencyNote: 'A 9% reserve (₹31,500) dedicated to municipal waste disposal and unexpected rain protection.',
+    budgetBreakdown: [
+      { id: 'c1', category: 'Public Grounds & Municipal Permits', percentage: 24, estimatedAmount: 84000, actualAmount: 0, notes: 'Municipal ground sanction, commercial power meter, and public sound NOC.' },
+      { id: 'c2', category: 'Eco Stalls, Shade Canopies & Benches', percentage: 28, estimatedAmount: 98000, actualAmount: 0, notes: '30 bamboo artisan stalls, cloth canopy shades, and recycled wooden benches.' },
+      { id: 'c3', category: 'PA Sound, Community Mic & Lighting', percentage: 15, estimatedAmount: 52500, actualAmount: 0, notes: 'Public address system, wireless podium mic for speakers, and solar ground lights.' },
+      { id: 'c4', category: 'Water Stations & Zero-Waste Sanitation', percentage: 14, estimatedAmount: 49000, actualAmount: 0, notes: 'Filtered water refill tankers, compostable waste bins, and green volunteer stewards.' },
+      { id: 'c5', category: 'Marketing, Banners & First Aid Station', percentage: 10, estimatedAmount: 35000, actualAmount: 0, notes: 'Cloth road banners, social media promotion, and certified first-aid paramedic booth.' },
+      { id: 'c6', category: 'Contingency & Emergency Reserve', percentage: 9, estimatedAmount: 31500, actualAmount: 0, notes: 'Reserved for weather contingencies and emergency ground cleaning.' }
+    ],
+    timeline: [
+      { id: 'ct1', phase: 'Plan', offsetDaysBefore: 45, timeframe: '6 weeks out', task: 'Municipal Sanctions & Ground Allotment', details: 'Apply for PMC grounds sanction and local police noise NOC for acoustic daylight hours.' },
+      { id: 'ct2', phase: 'Book', offsetDaysBefore: 30, timeframe: '4 weeks out', task: 'Stall Vendor Curation', details: 'Select 30 local farmers, potters, and organic food stalls. Collect security deposits.' },
+      { id: 'ct3', phase: 'Confirm', offsetDaysBefore: 14, timeframe: '2 weeks out', task: 'Waste Management & Water Plan', details: 'Contract composting partner for zero-waste segregation and book drinking water tankers.' },
+      { id: 'ct4', phase: 'Confirm', offsetDaysBefore: 3, timeframe: '3 days out', task: 'Volunteer Briefing & Layout Marking', details: 'Conduct volunteer walk-through, mark 10x10 stall grids, and test first-aid readiness.' },
+      { id: 'ct5', phase: 'Event day', offsetDaysBefore: 0, timeframe: 'Event Day (7:00 AM)', task: 'Stall Setup & Gates Open', details: 'Grounds open for vendor load-in at 7:00 AM. Public entry at 10:00 AM.' }
+    ],
+    vendors: [
+      {
+        id: 'cv1',
+        category: 'Eco Tent & Bamboo Stall Fabricator',
+        whyNeeded: 'Creates weather-resistant stalls without generating single-use plastic waste.',
+        estimatedRange: '₹90,000 – ₹1,05,000',
+        questionsToAsk: ['Are anchor pegs secure against sudden wind gusts?', 'Are stalls made of untreated natural bamboo and cloth?'],
+        redFlags: ['Uses plastic flex tarpaulins violating green charter', 'Unstable guy-wires posing trip hazards'],
+        status: 'Quoted',
+        notes: 'Spoke with GreenStructures Pune.'
+      },
+      {
+        id: 'cv2',
+        category: 'Composting & Waste Management Partner',
+        whyNeeded: 'Guarantees the event leaves zero trash behind in public parklands.',
+        estimatedRange: '₹25,000 – ₹32,000',
+        questionsToAsk: ['Do you process compostable wet waste locally?', 'Are waste education volunteers included?'],
+        redFlags: ['Mixing wet and dry waste after pickup', 'No certified disposal proof'],
+        status: 'To contact',
+        notes: 'Pending meeting with CleanPune Trust.'
+      }
+    ],
+    ideas: {
+      theme: ['Zero-Waste Harvest Celebration', 'Khadi, Earth & Sunshine'],
+      decor: ['Bunting made from recycled upcycled sarees', 'Potted medicinal plants as aisle markers', 'Chalkboard signs on reclaimed wood'],
+      menu: ['Jowar and Bajra bhakri with pitla', 'Fresh sugarcane juice press', 'Millets upma and buttermilk coolers in earthen cups'],
+      activities: ['Live pottery-wheel workshop for children', 'Seed-ball making station with native tree seeds', 'Community drum circle at sunset'],
+      returnGifts: ['Packets of heirloom tomato and marigold seeds in handmade paper envelopes'],
+      playlist: ['Acoustic folk instruments (flute, djembe, ektara) playing gently in the background'],
+      accessibility: ['Clear, obstacle-free dirt pathways wide enough for wheelchairs and strollers', 'Shaded senior-citizen rest pavilions with drinking water']
+    }
+  }
+};
+
+// ==========================================
+// 3. DETERMINISTIC BUDGET ENGINE
+// ==========================================
+/**
+ * Mathematically forces budget allocations to equal total budget down to the exact rupee.
+ * Treats 0 as 0, drops invalid categories, normalizes sums, and records normalization notes.
+ */
+function computeDeterministicBudget(totalBudget, categoryShares) {
+  // Treat 0 as 0; only fall back if completely non-numeric or negative
+  let budgetVal = Number(totalBudget);
+  if (!Number.isFinite(budgetVal) || budgetVal < 0) {
+    budgetVal = 0;
+  }
+  budgetVal = Math.round(budgetVal);
+
+  // Drop invalid categories: must have valid string name and non-negative percentage
+  let validShares = (Array.isArray(categoryShares) ? categoryShares : []).filter(c => {
+    if (!c || typeof c !== 'object') return false;
+    if (typeof c.category !== 'string' || c.category.trim().length === 0) return false;
+    const pct = Number(c.percentage);
+    return Number.isFinite(pct) && pct >= 0;
+  });
+
+  if (validShares.length === 0) {
+    validShares = [
+      { category: 'Catering & Hospitality', percentage: 34, notes: 'Main dining and hospitality' },
+      { category: 'Venue & Logistics', percentage: 24, notes: 'Space rental and facility setup' },
+      { category: 'Decor & Atmosphere', percentage: 16, notes: 'Lighting and ambiance' },
+      { category: 'Photography & Memories', percentage: 10, notes: 'Photo and media capture' },
+      { category: 'Sound & Entertainment', percentage: 8, notes: 'Music and sound equipment' },
+      { category: 'Contingency Reserve', percentage: 8, notes: 'Guaranteed safety reserve' }
+    ];
+  }
+
+  // Compute raw sum and normalize if not equal to 100
+  const rawSum = validShares.reduce((s, c) => s + Number(c.percentage), 0);
+  let normalizationNote = null;
+  if (Math.abs(rawSum - 100) > 0.05 && rawSum > 0) {
+    normalizationNote = `Category percentages summed to ${Math.round(rawSum * 10) / 10}%; automatically normalized to 100%.`;
+  }
+
+  const factor = rawSum > 0 ? 100 / rawSum : 0;
+
+  let computedItems = validShares.map((item, idx) => {
+    const rawPct = Number(item.percentage) || 0;
+    const normalizedPct = rawSum > 0 ? Math.round(rawPct * factor * 10) / 10 : 0;
+    // Treat 0 as 0
+    const provisionalAmt = budgetVal > 0 && normalizedPct > 0 ? Math.floor(budgetVal * (normalizedPct / 100)) : 0;
+    return {
+      id: item.id || `b_${idx + 1}`,
+      category: item.category.trim(),
+      percentage: normalizedPct,
+      estimatedAmount: provisionalAmt,
+      actualAmount: Number(item.actualAmount) >= 0 ? Number(item.actualAmount) : 0,
+      notes: typeof item.notes === 'string' ? item.notes : 'Estimated allocation'
+    };
+  });
+
+  // Calculate discrepancy from flooring
+  const allocatedSum = computedItems.reduce((s, c) => s + c.estimatedAmount, 0);
+  const diff = budgetVal - allocatedSum;
+
+  // Add discrepancy to non-zero category or contingency
+  if (diff !== 0 && budgetVal > 0 && computedItems.length > 0) {
+    let target = computedItems.find(c => c.category.toLowerCase().includes('contingency') && c.percentage > 0)
+      || computedItems.find(c => c.percentage > 0)
+      || computedItems[0];
+    if (target) {
+      target.estimatedAmount += diff;
+    }
+  }
+
+  return { items: computedItems, normalizationNote };
+}
+
+/**
+ * Assesses budget realism based on event type, guest count, and city.
+ */
+function assessBudgetRealism(budget, guests, eventType, location) {
+  budget = Math.max(0, Number(budget) || 0);
+  guests = Math.max(1, Number(guests) || 1);
+  const cpg = Math.round(budget / guests);
+  const loc = (location || '').toLowerCase();
+  const isMetro = loc.includes('mumbai') || loc.includes('bengaluru') || loc.includes('delhi') || loc.includes('hyderabad') || loc.includes('chennai');
+
+  let warning = null;
+  if (eventType === 'Wedding') {
+    const minThreshold = isMetro ? 2000 : 1500;
+    if (cpg < minThreshold) {
+      warning = `Budget alert: ₹${cpg.toLocaleString('en-IN')}/guest is very tight for a wedding in ${location || 'this city'}. Standard banquets with food and setup start around ₹${minThreshold.toLocaleString('en-IN')}/guest. Consider trimming guest count or choosing an intimate venue.`;
+    }
+  } else if (eventType === 'Birthday') {
+    const minThreshold = isMetro ? 700 : 500;
+    if (cpg < minThreshold) {
+      warning = `Budget notice: ₹${cpg.toLocaleString('en-IN')}/guest is on the leaner side for a structured birthday event. Self-catering or an intimate house party will maximize value.`;
+    }
+  } else if (eventType === 'Community') {
+    if (cpg < 200) {
+      warning = `Budget notice: ₹${cpg.toLocaleString('en-IN')}/guest requires strong community volunteer support and sponsored potlucks to balance infrastructure costs.`;
+    }
+  }
+
+  return { cpg, warning };
+}
+
+// ==========================================
+// 4. REALISTIC TIMELINE ENGINE
+// ==========================================
+/**
+ * Scales milestones proportionally using event-type full lead time as denominator.
+ * Guarantees no milestone is dated before today, preserves Book/Confirm order,
+ * and warns which tasks were squeezed.
+ */
+function generateRealTimeline(eventDateStr, eventType, rawMilestones) {
+  const targetDate = eventDateStr ? new Date(eventDateStr + 'T12:00:00') : new Date(Date.now() + 60 * 86400000);
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const targetMidnight = new Date(targetDate);
+  targetMidnight.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((targetMidnight - now) / 86400000);
+
+  // Full ideal lead times by event type
+  const IDEAL_LEAD_TIMES = {
+    Wedding: 180,
+    Birthday: 30,
+    Community: 60,
+    Anniversary: 45,
+    Other: 45
+  };
+  const idealDenominator = IDEAL_LEAD_TIMES[eventType] || 45;
+
+  let isPast = diffDays < 0;
+  let isRush = !isPast && diffDays < idealDenominator;
+  let squeezedNotice = null;
+
+  // Canonical milestones with ideal lead times
+  const CANONICAL_TEMPLATES = {
+    Wedding: [
+      { phase: 'Plan', idealOffset: 180, task: 'Lock Venue & Concept', details: 'Finalize banquet/lawn contract with noise clearance and secure date deposit.' },
+      { phase: 'Book', idealOffset: 120, task: 'Book Photographer & Decorator', details: 'Review creative portfolios, sign contracts, and finalize theme color palette.' },
+      { phase: 'Book', idealOffset: 60, task: 'Food Tastings & Send Invitations', details: 'Conduct menu tasting with caterer and dispatch digital invitations with RSVP tracking.' },
+      { phase: 'Confirm', idealOffset: 14, task: 'RSVP Freeze & Final Headcount', details: 'Lock catering headcount and review minute-by-minute sangeet run sheet with sound team.' },
+      { phase: 'Event day', idealOffset: 0, task: 'Ceremony Execution & Vendor Call Times', details: 'Conduct setup buffer at venue, welcome guests, and manage live ceremony coordination.' }
+    ],
+    Birthday: [
+      { phase: 'Plan', idealOffset: 30, task: 'Reserve Venue & Send Invites', details: 'Confirm venue capacity, indoor/outdoor weather backup, and digital save-the-dates.' },
+      { phase: 'Book', idealOffset: 20, task: 'Book Catering & Sound Setup', details: 'Order custom cake, lock party menu catering, and book sound equipment.' },
+      { phase: 'Confirm', idealOffset: 7, task: 'Confirm Supplies & Playlists', details: 'Lock guest count, download offline playlists, and organize party favors.' },
+      { phase: 'Event day', idealOffset: 0, task: 'Setup Buffer & Guest Welcome', details: 'Arrive 1 hour early for decor setup, test audio, and chill welcome drinks.' }
+    ],
+    Community: [
+      { phase: 'Plan', idealOffset: 60, task: 'Municipal Sanctions & Ground Allotment', details: 'Apply for municipal grounds permit, police sound NOC, and utility connections.' },
+      { phase: 'Book', idealOffset: 35, task: 'Stall Vendor Curation & Sound System', details: 'Select local artisan and food stalls; contract PA sound and stage lighting.' },
+      { phase: 'Confirm', idealOffset: 10, task: 'Sanitation & Volunteer Walkthrough', details: 'Contract composting and water tanker partner; conduct volunteer layout briefing.' },
+      { phase: 'Event day', idealOffset: 0, task: 'Vendor Load-in & Public Gates Open', details: 'Grounds open for stall setup at 7:00 AM; open public entry gates with safety stewards.' }
+    ]
+  };
+
+  const defaultTemplate = CANONICAL_TEMPLATES[eventType] || CANONICAL_TEMPLATES.Birthday;
+
+  // Prepare input milestones
+  let baseMilestones = [];
+  if (Array.isArray(rawMilestones) && rawMilestones.length > 0) {
+    baseMilestones = rawMilestones.map((rm, idx) => {
+      const ideal = Number(rm.idealOffset) || Number(rm.offsetDaysBefore) || Math.max(0, idealDenominator - idx * Math.round(idealDenominator / rawMilestones.length));
+      return {
+        id: rm.id || `t_${idx + 1}`,
+        phase: rm.phase || (ideal === 0 ? 'Event day' : ideal <= 14 ? 'Confirm' : ideal <= 60 ? 'Book' : 'Plan'),
+        idealOffset: ideal,
+        task: rm.task || `Milestone ${idx + 1}`,
+        details: rm.details || ''
+      };
+    });
+  } else {
+    baseMilestones = defaultTemplate.map((item, idx) => ({
+      id: `t_${idx + 1}`,
+      phase: item.phase,
+      idealOffset: item.idealOffset,
+      task: item.task,
+      details: item.details
+    }));
+  }
+
+  // Strictly sort template by idealOffset descending (Plan -> Book -> Confirm -> Event day)
+  baseMilestones.sort((a, b) => b.idealOffset - a.idealOffset);
+
+  let calculatedMilestones = [];
+  let squeezedTasks = [];
+
+  if (isPast) {
+    // Past date retrospective schedule: use ideal offsets backwards from the past event date
+    calculatedMilestones = baseMilestones.map((m, idx) => {
+      const itemDate = new Date(targetDate.getTime() - m.idealOffset * 86400000);
+      return {
+        id: m.id || `t_${idx + 1}`,
+        phase: m.phase,
+        offsetDaysBefore: m.idealOffset,
+        idealOffset: m.idealOffset,
+        calculatedDate: formatDate(itemDate),
+        timeframe: m.idealOffset === 0 ? 'Event Day' : `${m.idealOffset} days out`,
+        task: m.task,
+        details: m.details
+      };
+    });
+  } else if (diffDays === 0) {
+    // Event is today: all tasks are today
+    calculatedMilestones = baseMilestones.map((m, idx) => ({
+      id: m.id || `t_${idx + 1}`,
+      phase: m.phase,
+      offsetDaysBefore: 0,
+      idealOffset: m.idealOffset,
+      calculatedDate: formatDate(now),
+      timeframe: 'Today',
+      task: m.task,
+      details: m.details
+    }));
+    squeezedNotice = `Event is today! All ${baseMilestones.length} milestones compressed into today's critical path.`;
+  } else if (isRush) {
+    // Scale ALL milestones proportionally using idealDenominator
+    const scaleFactor = diffDays / idealDenominator;
+
+    // Calculate raw scaled offsets
+    let scaledOffsets = baseMilestones.map(m => {
+      let scaled = Math.round(m.idealOffset * scaleFactor);
+      // Clamp to available days: cannot exceed diffDays and cannot be less than 0
+      scaled = Math.max(0, Math.min(diffDays, scaled));
+      return scaled;
+    });
+
+    // Enforce strict monotonically non-increasing offsets to preserve Book/Confirm order
+    // and guarantee NO milestone is dated before today (offset <= diffDays)
+    for (let i = 0; i < scaledOffsets.length; i++) {
+      if (i === 0) {
+        // Earliest task: cannot exceed diffDays
+        scaledOffsets[i] = Math.min(diffDays, scaledOffsets[i]);
+      } else {
+        // Subsequent tasks must not exceed previous task
+        if (scaledOffsets[i] > scaledOffsets[i - 1]) {
+          scaledOffsets[i] = scaledOffsets[i - 1];
+        }
+      }
+    }
+    // Final milestone must be Event Day (offset 0)
+    scaledOffsets[scaledOffsets.length - 1] = 0;
+
+    calculatedMilestones = baseMilestones.map((m, idx) => {
+      const offset = scaledOffsets[idx];
+      const itemDate = new Date(targetDate.getTime() - offset * 86400000);
+
+      // Track if milestone was squeezed
+      if (offset < m.idealOffset) {
+        squeezedTasks.push({ task: m.task, from: m.idealOffset, to: offset });
+      }
+
+      return {
+        id: m.id || `t_${idx + 1}`,
+        phase: m.phase,
+        offsetDaysBefore: offset,
+        idealOffset: m.idealOffset,
+        calculatedDate: formatDate(itemDate),
+        timeframe: offset === 0 ? 'Event Day' : `${offset} days out`,
+        task: m.task,
+        details: m.details
+      };
+    });
+
+    if (squeezedTasks.length > 0) {
+      const taskNames = squeezedTasks.map(t => `${t.task} (${t.from}d → ${t.to}d out)`).join(', ');
+      squeezedNotice = `Timeline compressed: ${diffDays} days available vs ideal ${idealDenominator} days for ${eventType}. Squeezed tasks: ${taskNames}.`;
+    }
+  } else {
+    // Ample time: all ideal lead times fit comfortably, all >= today
+    calculatedMilestones = baseMilestones.map((m, idx) => {
+      const itemDate = new Date(targetDate.getTime() - m.idealOffset * 86400000);
+      return {
+        id: m.id || `t_${idx + 1}`,
+        phase: m.phase,
+        offsetDaysBefore: m.idealOffset,
+        idealOffset: m.idealOffset,
+        calculatedDate: formatDate(itemDate),
+        timeframe: m.idealOffset === 0 ? 'Event Day' : `${m.idealOffset} days out`,
+        task: m.task,
+        details: m.details
+      };
+    });
+  }
+
+  return { milestones: calculatedMilestones, isPast, isRush, diffDays, squeezedNotice };
+}
+
+// ==========================================
+// 5. STRUCTURED GEMINI API CLIENT
+// ==========================================
+/**
+ * Strict response schema with optional newBudget, newGuests, newDate for chat modifications.
+ */
+const GEMINI_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    title: { type: "STRING", description: "Vibrant, creative and specific event title" },
+    summary: { type: "STRING", description: "Strategic executive planning overview" },
+    contingencyNote: { type: "STRING", description: "Contingency reserve explanation and percentage" },
+    newBudget: { type: "NUMBER", description: "Optional updated total budget in INR if requested by user" },
+    newGuests: { type: "INTEGER", description: "Optional updated guest count if requested by user" },
+    newDate: { type: "STRING", description: "Optional updated event date (YYYY-MM-DD) if requested by user" },
+    budgetPercentages: {
+      type: "ARRAY",
+      description: "Category shares with percentage numbers summing to 100",
+      items: {
+        type: "OBJECT",
+        properties: {
+          category: { type: "STRING" },
+          percentage: { type: "NUMBER" },
+          notes: { type: "STRING" }
+        },
+        required: ["category", "percentage", "notes"]
+      }
+    },
+    timeline: {
+      type: "ARRAY",
+      description: "Dated milestones working backward from the event date",
+      items: {
+        type: "OBJECT",
+        properties: {
+          phase: { type: "STRING", enum: ["Plan", "Book", "Confirm", "Event day"] },
+          idealOffset: { type: "INTEGER", description: "Ideal days before event in uncompressed schedule" },
+          task: { type: "STRING" },
+          details: { type: "STRING" }
+        },
+        required: ["phase", "task", "details"]
+      }
+    },
+    vendors: {
+      type: "ARRAY",
+      description: "Key vendor categories with diligence checklists",
+      items: {
+        type: "OBJECT",
+        properties: {
+          category: { type: "STRING" },
+          whyNeeded: { type: "STRING" },
+          estimatedRange: { type: "STRING" },
+          questionsToAsk: { type: "ARRAY", items: { type: "STRING" } },
+          redFlags: { type: "ARRAY", items: { type: "STRING" } }
+        },
+        required: ["category", "whyNeeded", "estimatedRange", "questionsToAsk", "redFlags"]
+      }
+    },
+    ideas: {
+      type: "OBJECT",
+      description: "Tailored creative concepts organized by specific dimensions",
+      properties: {
+        theme: { type: "ARRAY", items: { type: "STRING" } },
+        decor: { type: "ARRAY", items: { type: "STRING" } },
+        menu: { type: "ARRAY", items: { type: "STRING" } },
+        activities: { type: "ARRAY", items: { type: "STRING" } },
+        returnGifts: { type: "ARRAY", items: { type: "STRING" } },
+        playlist: { type: "ARRAY", items: { type: "STRING" } },
+        accessibility: { type: "ARRAY", items: { type: "STRING" } }
+      },
+      required: ["theme", "decor", "menu", "activities", "returnGifts", "playlist", "accessibility"]
+    }
+  },
+  required: ["title", "summary", "contingencyNote", "budgetPercentages", "timeline", "vendors", "ideas"]
+};
+
+/**
+ * Validates basic required fields of raw API response.
+ */
+function validateRawAPIResponse(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+  if (typeof obj.title !== 'string' || typeof obj.summary !== 'string') return false;
+  if (!Array.isArray(obj.budgetPercentages) && !Array.isArray(obj.budgetBreakdown)) return false;
+  if (!Array.isArray(obj.timeline)) return false;
+  if (!Array.isArray(obj.vendors)) return false;
+  if (!obj.ideas || typeof obj.ideas !== 'object') return false;
+  return true;
+}
+
+/**
+ * Calls Gemini REST API using x-goog-api-key header and structured output.
+ * Retries once on failure and surfaces model name in error toast.
+ */
+async function callGeminiAPI(systemInstruction, userPrompt, retryCount = 1) {
+  if (!API_KEY) {
+    throw new Error('NO_API_KEY');
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`;
+
+  const requestBody = {
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text: `${systemInstruction}\n\nTask:\n${userPrompt}` }]
+      }
+    ],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      responseSchema: GEMINI_RESPONSE_SCHEMA,
+      temperature: 0.65
+    }
+  };
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': API_KEY
+      },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let parsedErr = {};
+      try { parsedErr = JSON.parse(errText); } catch(e){}
+      const message = parsedErr.error?.message || errText;
+
+      if (response.status === 400 || response.status === 403) {
+        throw new Error(`[${MODEL}] Authentication error: ${message}`);
+      } else if (response.status === 429) {
+        throw new Error(`[${MODEL}] Rate limit / quota exceeded: ${message}`);
+      } else {
+        throw new Error(`[${MODEL}] API Error (${response.status}): ${message}`);
+      }
+    }
+
+    const data = await response.json();
+    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!candidateText) {
+      throw new Error(`[${MODEL}] Empty response returned by model.`);
+    }
+
+    let parsedResult;
+    try {
+      parsedResult = JSON.parse(candidateText);
+    } catch (e) {
+      throw new Error(`[${MODEL}] Failed to parse JSON output.`);
+    }
+
+    if (!validateRawAPIResponse(parsedResult)) {
+      throw new Error(`[${MODEL}] Response failed schema validation.`);
+    }
+
+    return parsedResult;
+
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error(`[${MODEL}] Request timed out after 30 seconds.`);
+    }
+
+    if (retryCount > 0 && !err.message.includes('Authentication error')) {
+      console.warn(`[${MODEL}] Retrying Gemini API call once after error:`, err.message);
+      return await callGeminiAPI(systemInstruction, userPrompt + '\n\nPlease adhere strictly to valid JSON and provided schema.', retryCount - 1);
+    }
+    throw err;
+  }
+}
+
+// ==========================================
+// 6. PLAN GENERATION & NORMALIZATION
+// ==========================================
+async function generatePlanFromInput(userInput) {
+  const systemInstruction = `You are Gatherly, an experienced, grounded celebration & event planning director.
+Create an authentic, culturally sensitive, non-generic event plan.
+Always prioritize accessibility, realistic lead-times, and buffer periods.
+Never invent fictional vendor companies or exact rigid vendor prices; always specify realistic estimated percentage shares and price brackets.
+Ensure budgetPercentages has categories with percentage numbers summing to 100 (including a dedicated Contingency Reserve of 6-10%).`;
+
+  const promptText = `Generate a comprehensive event plan for:
+Event Type: ${userInput.eventType} (${userInput.eventSubType || 'General'})
+Guests: ${userInput.guests}
+Total Budget: ₹${userInput.budget}
+Event Date: ${userInput.date}
+Location: ${userInput.location}
+Vibe / Tone: ${userInput.vibe}
+Cultural Style: ${userInput.culturalStyle || 'Contemporary'}
+Dietary Needs: ${userInput.dietary || 'Standard catering'}
+Setting: ${userInput.indoorOutdoor}
+Duration: ${userInput.duration}
+Venue Already Booked: ${userInput.venueBooked ? 'Yes' : 'No'}
+Top Priorities: ${userInput.priorities.join(', ')}`;
+
+  if (API_KEY) {
+    try {
+      const aiResult = await callGeminiAPI(systemInstruction, promptText);
+      return normalizePlanObject(aiResult, userInput, 'ai');
+    } catch (err) {
+      console.error('Gemini generation failed:', err);
+      showToast(`Error (${MODEL}): ${err.message}. Showing local plan instead.`);
+      return createOfflineLocalPlan(userInput);
+    }
+  } else {
+    return createOfflineLocalPlan(userInput);
+  }
+}
+
+function normalizePlanObject(raw, input, source) {
+  const budgetShares = raw.budgetPercentages || raw.budgetBreakdown || [];
+  const budgetEngineResult = computeDeterministicBudget(input.budget, budgetShares);
+  const realism = assessBudgetRealism(input.budget, input.guests, input.eventType, input.location);
+  const timelineData = generateRealTimeline(input.date, input.eventType, raw.timeline);
+
+  const vendors = (raw.vendors || []).map((v, i) => ({
+    id: v.id || `v_${i + 1}`,
+    category: typeof v.category === 'string' ? v.category.trim() : 'Specialist Vendor',
+    whyNeeded: typeof v.whyNeeded === 'string' ? v.whyNeeded : 'Essential coordination',
+    estimatedRange: typeof v.estimatedRange === 'string' ? v.estimatedRange : 'Estimate based on allocation',
+    questionsToAsk: Array.isArray(v.questionsToAsk) ? v.questionsToAsk.slice(0, 4) : ['What is your cancellation policy?'],
+    redFlags: Array.isArray(v.redFlags) ? v.redFlags.slice(0, 3) : ['No itemized contract'],
+    status: v.status || 'To contact',
+    notes: typeof v.notes === 'string' ? v.notes : ''
+  }));
+
+  const ideas = raw.ideas || {
+    theme: ['Warm Contemporary Minimalist'],
+    decor: ['Festoon lighting & local floral arrangements'],
+    menu: ['Curated seasonal appetizers'],
+    activities: ['Welcome photo guestbook'],
+    returnGifts: ['Artisanal local seed-paper souvenirs'],
+    playlist: ['Acoustic background melodies'],
+    accessibility: ['Step-free venue access and comfortable seating']
+  };
+
+  return {
+    id: `plan_${Date.now()}`,
+    source: source,
+    title: raw.title || `${input.eventType} in ${input.location}`,
+    eventType: input.eventType,
+    eventSubType: input.eventSubType || '',
+    culturalStyle: input.culturalStyle || '',
+    guests: Number(input.guests) || 1,
+    budget: Number(input.budget) >= 0 ? Number(input.budget) : 0,
+    date: input.date,
+    location: input.location,
+    venueBooked: Boolean(input.venueBooked),
+    duration: input.duration,
+    indoorOutdoor: input.indoorOutdoor,
+    dietary: input.dietary || '',
+    priorities: input.priorities || [],
+    costPerGuest: realism.cpg,
+    realismWarning: realism.warning,
+    summary: raw.summary || `A planned ${input.guests}-guest gathering in ${input.location}.`,
+    contingencyNote: raw.contingencyNote || `Keep a dedicated 8% contingency buffer for sudden requirements.`,
+    budgetBreakdown: budgetEngineResult.items,
+    budgetNormalizationNote: budgetEngineResult.normalizationNote,
+    timeline: timelineData.milestones,
+    isPastTimeline: timelineData.isPast,
+    isRushTimeline: timelineData.isRush,
+    timelineDiffDays: timelineData.diffDays,
+    timelineSqueezedNotice: timelineData.squeezedNotice,
+    vendors: vendors,
+    ideas: ideas,
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function createOfflineLocalPlan(input) {
+  const type = input.eventType;
+  const isWedding = type === 'Wedding';
+  const isCommunity = type === 'Community';
+
+  const defaultPercentages = isWedding
+    ? [ { category: 'Catering & Dining Feasts', percentage: 34, notes: 'Multi-course welcome drinks, appetizers and main buffet' },
+        { category: 'Venue, Hall & Lawns', percentage: 22, notes: 'Location rental, lighting power and permits' },
+        { category: 'Decor, Mandap & Floral Styling', percentage: 17, notes: 'Stage, entrance arch and tables' },
+        { category: 'Photography & Cinematography', percentage: 11, notes: 'Photo, video and teaser' },
+        { category: 'Music, Sound & DJ', percentage: 8, notes: 'Sound equipment and entertainment' },
+        { category: 'Contingency Reserve', percentage: 8, notes: 'Reserved for unexpected additions' } ]
+    : isCommunity
+    ? [ { category: 'Grounds & Municipal Sanctions', percentage: 25, notes: 'Site permit and commercial sanitation' },
+        { category: 'Stalls, Canopies & Seating', percentage: 27, notes: 'Eco-friendly stalls and shade umbrellas' },
+        { category: 'PA Sound, Lighting & Mics', percentage: 16, notes: 'Sound system and stage microphones' },
+        { category: 'Water, Safety & Sanitation', percentage: 13, notes: 'Refillable water and first aid' },
+        { category: 'Signage, Badges & Outreach', percentage: 11, notes: 'Public awareness and volunteer packs' },
+        { category: 'Contingency Reserve', percentage: 8, notes: 'Reserved for weather backup' } ]
+    : [ { category: 'Catering, Tapas & Cake', percentage: 36, notes: 'Curated food, artisan bakery and drinks' },
+        { category: 'Venue / Space Booking', percentage: 22, notes: 'Space rental and setup buffer' },
+        { category: 'Decor, Lighting & Props', percentage: 16, notes: 'Festoon lights, table styling and photo backdrops' },
+        { category: 'Sound, DJ / Music System', percentage: 10, notes: 'Speakers and mic setup' },
+        { category: 'Photography / Memories', percentage: 8, notes: 'Photo documentation' },
+        { category: 'Contingency Reserve', percentage: 8, notes: 'Incidentals and extra ice/supplies' } ];
+
+  const rawVendors = isWedding
+    ? [ { category: 'Banqueting & Lawn Lead', whyNeeded: 'Coordinates facility setup, parking and electrical permits.', estimatedRange: '20%–25% of total budget', questionsToAsk: ['Are outside decorators permitted without surcharge?', 'What is the outdoor sound curfew?'], redFlags: ['Hidden generator diesel charges', 'No dedicated parking supervisor'] },
+        { category: 'Wedding Caterer', whyNeeded: 'Central guest experience requiring flawless food timing.', estimatedRange: '30%–35% of total budget', questionsToAsk: ['Do you provide live cooking stations?', 'Is pre-event tasting included?'], redFlags: ['Low server-to-guest ratio', 'Refusal to write menu items in contract'] },
+        { category: 'Photographer & Cinematographer', whyNeeded: 'Captures once-in-a-lifetime memories and rituals.', estimatedRange: '10%–12% of total budget', questionsToAsk: ['Who exactly will shoot on event day?', 'What is the album delivery timeline?'], redFlags: ['Outsourcing actual shoot to unverified freelancers', 'Vague RAW file policies'] } ]
+    : [ { category: 'Venue Coordinator', whyNeeded: 'Ensures venue access, clean restrooms and power backup.', estimatedRange: '20%–25% of total budget', questionsToAsk: ['Can we access the venue 1 hour early for setup?', 'Is sound permitted till 10:30 PM?'], redFlags: ['Unclear cleanup fees', 'No elevator for rooftop access'] },
+        { category: 'Specialty Caterer & Baker', whyNeeded: 'Curates menu matching dietary needs with custom birthday cake.', estimatedRange: '35%–40% of total budget', questionsToAsk: ['Are warming trays and biodegradable cutlery supplied?', 'Can you accommodate dietary allergies?'], redFlags: ['No temperature-controlled food transport', 'Unclear minimum guest billing'] },
+        { category: 'Sound & Audio Equipment', whyNeeded: 'Ensures clear music and speeches without distortion.', estimatedRange: '8%–10% of total budget', questionsToAsk: ['Do you provide wireless microphones?', 'Is on-site technician included?'], redFlags: ['Underpowered single speaker', 'Damaged cables'] } ];
+
+  const rawIdeas = {
+    theme: [`${input.vibe.split(',')[0] || 'Warm Elegant'} celebration`, 'Organic Botanical Aesthetic'],
+    decor: ['Warm festoon lights overhead canopy', 'Fresh potted greenery and floral accents on tables', 'Custom welcome sign with calligraphy'],
+    menu: [`Curated menu featuring ${input.dietary || 'seasonal local specialties'}`, 'Refreshing non-alcoholic fruit and herb spritzers', 'Artisan dessert display'],
+    activities: ['Guest polaroid and memory card table', 'Warm toast and speech moment before dinner', 'Curated group games or trivia'],
+    returnGifts: ['Artisanal organic seed packets with personalized thank you message', 'Local gourmet tea or spice blends'],
+    playlist: ['Warm acoustic folk transitioning to celebratory upbeat rhythm during dinner'],
+    accessibility: ['Ramp and step-free access to all dining and stage areas', 'Dedicated comfortable seating for seniors and nursing mothers']
+  };
+
+  const raw = {
+    title: `${input.eventSubType || input.eventType}: ${input.vibe.split(',')[0]} in ${input.location}`,
+    summary: `A grounded, people-centric ${input.eventType.toLowerCase()} for ${input.guests} guests in ${input.location}. Prioritizes hospitality, sensible vendor contracts, and zero-panic buffer time.`,
+    contingencyNote: `A dedicated 8% contingency fund is locked in the budget so minor unforeseen expenses never cause stress.`,
+    budgetPercentages: defaultPercentages,
+    timeline: [],
+    vendors: rawVendors,
+    ideas: rawIdeas
+  };
+
+  return normalizePlanObject(raw, input, 'offline');
+}
+
+// ==========================================
+// 7. CHAT CO-PLANNER REFINEMENT LOOP
+// ==========================================
+async function processChatRefinement(userMessage) {
+  if (!currentPlan) {
+    showToast('Please generate or load a plan first.');
+    return;
+  }
+
+  appendChatMessage('user', userMessage);
+  setChatStatus('Thinking…');
+
+  const oldPlan = JSON.parse(JSON.stringify(currentPlan));
+
+  if (API_KEY) {
+    const systemPrompt = `You are Gatherly, an expert AI event co-planner.
+The user is modifying their existing event plan.
+Given the current plan JSON and user request:
+- If user requests to change budget total, set newBudget (number in INR).
+- If user requests to change guest count, set newGuests (integer).
+- If user requests to change date, set newDate (YYYY-MM-DD).
+- Return updated budgetPercentages, timeline, vendors, and ideas adhering strictly to the schema.
+- Preserve existing vendor categories where appropriate.`;
+
+    const userPrompt = `Current Plan State:
+${JSON.stringify(currentPlan, null, 2)}
+
+User's Modification Request:
+"${userMessage}"
+
+Update the plan accordingly and return valid JSON.`;
+
+    try {
+      const updatedRaw = await callGeminiAPI(systemPrompt, userPrompt);
+
+      let targetBudget = currentPlan.budget;
+      if (updatedRaw.newBudget != null && Number(updatedRaw.newBudget) >= 0) {
+        targetBudget = Math.round(Number(updatedRaw.newBudget));
+      }
+
+      let targetGuests = currentPlan.guests;
+      if (updatedRaw.newGuests != null && Number(updatedRaw.newGuests) > 0) {
+        targetGuests = Math.round(Number(updatedRaw.newGuests));
+      }
+
+      let targetDate = currentPlan.date;
+      if (updatedRaw.newDate && /^\d{4}-\d{2}-\d{2}$/.test(updatedRaw.newDate)) {
+        targetDate = updatedRaw.newDate;
+      }
+
+      const updatedPlan = normalizePlanObject(updatedRaw, {
+        eventType: updatedRaw.eventType || currentPlan.eventType,
+        eventSubType: updatedRaw.eventSubType || currentPlan.eventSubType,
+        guests: targetGuests,
+        budget: targetBudget,
+        date: targetDate,
+        location: currentPlan.location,
+        vibe: currentPlan.vibe || userMessage,
+        culturalStyle: currentPlan.culturalStyle,
+        dietary: currentPlan.dietary,
+        indoorOutdoor: currentPlan.indoorOutdoor,
+        duration: currentPlan.duration,
+        venueBooked: currentPlan.venueBooked,
+        priorities: currentPlan.priorities
+      }, 'ai');
+
+      // Preserve actualAmount across every refinement
+      preserveActualAmounts(oldPlan.budgetBreakdown, updatedPlan.budgetBreakdown);
+      // Preserve vendor status and notes across every refinement
+      mergeVendorEdits(oldPlan.vendors, updatedPlan.vendors);
+
+      // Sync form inputs
+      syncFormInputs(updatedPlan);
+
+      currentPlan = updatedPlan;
+      savePlanToStorage();
+      renderPlan(currentPlan, oldPlan);
+
+      appendChatMessage('assistant', `Plan updated! I've incorporated your feedback: "${userMessage}". Changed items are highlighted.`);
+    } catch (err) {
+      console.error('Chat refinement failed:', err);
+      appendChatMessage('assistant', `Couldn't update via AI (${err.message}). Performing local adjustment.`);
+      applyLocalChatRefinement(userMessage, oldPlan);
+    } finally {
+      setChatStatus('Ready');
+    }
+  } else {
+    applyLocalChatRefinement(userMessage, oldPlan);
+    setChatStatus('Ready');
+  }
+}
+
+/**
+ * Offline chat handling with distinct intents:
+ * - Budget adjustments
+ * - Strict Jain menu (separated from vegan)
+ * - 100% Vegan menu (separated from Jain)
+ * - Vegetarian menu
+ * - Venue booked (marks status Booked without auto-filling spend)
+ * - Guest count change
+ * - Date change
+ * - Add a vendor
+ */
+function applyLocalChatRefinement(userMessage, oldPlan) {
+  const msg = userMessage.toLowerCase();
+  let feedback = 'I have adjusted your plan based on your request:';
+
+  // 1. Budget Total Change / Cheaper
+  if (msg.includes('cheaper') || msg.includes('reduce budget') || msg.includes('cut cost') || msg.includes('make it cheaper')) {
+    const oldBudget = currentPlan.budget;
+    const newBudget = Math.round(oldBudget * 0.85);
+    currentPlan.budget = newBudget;
+    const res = computeDeterministicBudget(newBudget, currentPlan.budgetBreakdown);
+    preserveActualAmounts(currentPlan.budgetBreakdown, res.items);
+    currentPlan.budgetBreakdown = res.items;
+    currentPlan.budgetNormalizationNote = res.normalizationNote;
+    currentPlan.costPerGuest = Math.round(newBudget / currentPlan.guests);
+    $('budget').value = newBudget;
+    feedback = `Trimmed total budget by 15% from ₹${oldBudget.toLocaleString('en-IN')} to ₹${newBudget.toLocaleString('en-IN')} (₹${currentPlan.costPerGuest.toLocaleString('en-IN')}/guest).`;
+  }
+  // 2. Strict Jain Menu (Separated from Vegan)
+  else if (msg.includes('jain')) {
+    currentPlan.dietary = 'Strict Jain vegetarian (no onion, garlic, or root vegetables; separate preparation counters)';
+    currentPlan.ideas.menu = [
+      'Dedicated Jain live snack counter with raw banana cutlets, khaman dhokla & herbal coolers',
+      'Rich shahi paneer cooked with cashew-tomato gravy (strictly no onion, no garlic)',
+      'Moong dal halwa and fresh tender coconut pudding'
+    ];
+    $('dietary').value = currentPlan.dietary;
+    feedback = 'Updated menu and dietary needs to strict Jain vegetarian standards (no onion, garlic, or root vegetables).';
+  }
+  // 3. 100% Vegan Menu (Separated from Jain)
+  else if (msg.includes('vegan')) {
+    currentPlan.dietary = '100% Plant-based Vegan (zero dairy, no honey, plant milks & tofu specialties)';
+    currentPlan.ideas.menu = [
+      'Plant-based artisanal grazing board with cashew brie, almond feta & sourdough crisps',
+      'Grilled marinated tofu & vegetable skewers with coconut curry and brown rice',
+      'Vegan dark chocolate avocado mousse with fresh berry coulis'
+    ];
+    $('dietary').value = currentPlan.dietary;
+    feedback = 'Updated menu and dietary needs to 100% plant-based vegan cuisine with zero dairy.';
+  }
+  // 4. Vegetarian Menu
+  else if (msg.includes('vegetarian')) {
+    currentPlan.dietary = 'Gourmet vegetarian dining with fresh seasonal produce and live dessert counters';
+    currentPlan.ideas.menu = [
+      'Live street food chaat counter and artisanal paneer appetizers',
+      'Slow-cooked Dal Makhani, seasonal vegetable biryani and butter naans',
+      'Warm jalebi with rabri and artisanal kulfi sticks'
+    ];
+    $('dietary').value = currentPlan.dietary;
+    feedback = 'Updated menu to gourmet vegetarian specialties.';
+  }
+  // 5. Venue Booked (Marks status Booked, leaves actualAmount intact)
+  else if (msg.includes('venue') && (msg.includes('booked') || msg.includes('locked') || msg.includes('reserved'))) {
+    currentPlan.venueBooked = true;
+    $('venueBooked').checked = true;
+    const venueVendor = currentPlan.vendors.find(v => v.category.toLowerCase().includes('venue') || v.category.toLowerCase().includes('banquet') || v.category.toLowerCase().includes('lawn'));
+    if (venueVendor) {
+      venueVendor.status = 'Booked';
+    }
+    feedback = 'Flagged venue as Booked in your vendor checklist. (Actual spend has not been altered; enter your invoice amount in the budget table when ready).';
+  }
+  // 6. Guest Count Change Intent
+  else if (/(\b(?:change|set|update|make)?\s*guests?(?:\s*to|\s*count)?\s*(\d+)\b)|(\b(\d+)\s*guests?\b)/i.test(msg)) {
+    const match = msg.match(/(\b(?:change|set|update|make)?\s*guests?(?:\s*to|\s*count)?\s*(\d+)\b)|(\b(\d+)\s*guests?\b)/i);
+    const count = parseInt(match[2] || match[4], 10);
+    if (count > 0) {
+      currentPlan.guests = count;
+      $('guests').value = count;
+      const realism = assessBudgetRealism(currentPlan.budget, count, currentPlan.eventType, currentPlan.location);
+      currentPlan.costPerGuest = realism.cpg;
+      currentPlan.realismWarning = realism.warning;
+      feedback = `Updated guest count to ${count} guests. New cost per guest: ₹${realism.cpg.toLocaleString('en-IN')}/guest.`;
+    }
+  }
+  // 7. Date Change Intent
+  else if (/(?:move|shift|change|set)\s*date\s*(?:to)?\s*(\d{4}-\d{2}-\d{2})/i.test(msg)) {
+    const match = msg.match(/(?:move|shift|change|set)\s*date\s*(?:to)?\s*(\d{4}-\d{2}-\d{2})/i);
+    const newDateStr = match[1];
+    currentPlan.date = newDateStr;
+    $('date').value = newDateStr;
+    const timelineData = generateRealTimeline(newDateStr, currentPlan.eventType, currentPlan.timeline);
+    currentPlan.timeline = timelineData.milestones;
+    currentPlan.isPastTimeline = timelineData.isPast;
+    currentPlan.isRushTimeline = timelineData.isRush;
+    currentPlan.timelineDiffDays = timelineData.diffDays;
+    currentPlan.timelineSqueezedNotice = timelineData.squeezedNotice;
+    feedback = `Event date updated to ${newDateStr}. Timeline milestones have been recalculated.`;
+  }
+  // 8. Add a Vendor Intent
+  else if (/(?:add\s+(?:a\s+)?vendor|add\s+vendor)\s*(?::\s*|\s+)?(.+)/i.test(msg) || /(?:add|include)\s+(?:a\s+)?(photographer|videographer|dj|decorator|florist|caterer|baker|makeup\s+artist|mehendi\s+artist|band|musician|coordinator|security|emcee|anchor)/i.test(msg)) {
+    const match = msg.match(/(?:add\s+(?:a\s+)?vendor|add\s+vendor)\s*(?::\s*|\s+)?(.+)/i) || msg.match(/(?:add|include)\s+(?:a\s+)?(photographer|videographer|dj|decorator|florist|caterer|baker|makeup\s+artist|mehendi\s+artist|band|musician|coordinator|security|emcee|anchor)/i);
+    const vendorName = (match[1] || 'Specialist Vendor').trim().replace(/^[a-z]/, c => c.toUpperCase());
+    const newVendor = {
+      id: `v_${Date.now()}`,
+      category: vendorName,
+      whyNeeded: `Dedicated ${vendorName} for professional event experience.`,
+      estimatedRange: 'To be quoted',
+      questionsToAsk: [
+        'What packages and equipment are included in your quote?',
+        'Do you provide an itemized written contract?',
+        'What is your cancellation and backup staff policy?'
+      ],
+      redFlags: [
+        'No itemized written deliverables',
+        'Demanding 100% upfront fee before consultation'
+      ],
+      status: 'To contact',
+      notes: ''
+    };
+    currentPlan.vendors.push(newVendor);
+    feedback = `Added new vendor "${vendorName}" to your vendor diligence checklist.`;
+  }
+  else {
+    feedback = `Noted: "${userMessage}". For unconstrained AI reasoning, connect your Gemini API key in API Settings.`;
+  }
+
+  savePlanToStorage();
+  renderPlan(currentPlan, oldPlan);
+  appendChatMessage('assistant', feedback);
+}
+
+function preserveActualAmounts(oldBreakdown, newBreakdown) {
+  if (!Array.isArray(oldBreakdown) || !Array.isArray(newBreakdown)) return;
+  newBreakdown.forEach(nb => {
+    const match = oldBreakdown.find(ob => ob.id === nb.id || ob.category.toLowerCase() === nb.category.toLowerCase());
+    if (match && Number(match.actualAmount) >= 0) {
+      nb.actualAmount = Number(match.actualAmount);
+    }
+  });
+}
+
+function mergeVendorEdits(oldVendors, newVendors) {
+  if (!Array.isArray(oldVendors) || !Array.isArray(newVendors)) return;
+  newVendors.forEach(nv => {
+    const match = oldVendors.find(ov => ov.id === nv.id || ov.category.toLowerCase() === nv.category.toLowerCase());
+    if (match) {
+      nv.status = match.status;
+      if (match.notes && !nv.notes) {
+        nv.notes = match.notes;
+      }
+    }
+  });
+}
+
+function syncFormInputs(plan) {
+  if (!plan) return;
+  if ($('eventType')) $('eventType').value = plan.eventType;
+  if ($('eventSubType')) $('eventSubType').value = plan.eventSubType || '';
+  if ($('guests')) $('guests').value = plan.guests;
+  if ($('budget')) $('budget').value = plan.budget;
+  if ($('date')) $('date').value = plan.date;
+  if ($('location')) $('location').value = plan.location;
+  if ($('venueBooked')) $('venueBooked').checked = plan.venueBooked;
+  if ($('dietary')) $('dietary').value = plan.dietary || '';
+}
+
+// ==========================================
+// 8. RENDERING & HONEST UI DIFFING
+// ==========================================
+/**
+ * Renders plan and highlights ONLY elements that actually changed between oldPlan and newPlan.
+ */
+function renderPlan(plan, oldPlan = null) {
+  if (!plan) return;
+
+  $('emptyState').style.display = 'none';
+  $('planContent').style.display = 'block';
+
+  // Compute diffs
+  const diffs = {
+    title: oldPlan ? oldPlan.title !== plan.title : false,
+    budget: oldPlan ? oldPlan.budget !== plan.budget : false,
+    guests: oldPlan ? oldPlan.guests !== plan.guests : false,
+    date: oldPlan ? oldPlan.date !== plan.date : false,
+    changedBudgetIds: new Set(),
+    changedTimelineIds: new Set(),
+    changedVendorIds: new Set(),
+    ideasChanged: oldPlan ? JSON.stringify(oldPlan.ideas) !== JSON.stringify(plan.ideas) : false
+  };
+
+  if (oldPlan && Array.isArray(oldPlan.budgetBreakdown)) {
+    plan.budgetBreakdown.forEach(nb => {
+      const ob = oldPlan.budgetBreakdown.find(b => b.id === nb.id || b.category.toLowerCase() === nb.category.toLowerCase());
+      if (!ob || ob.percentage !== nb.percentage || ob.estimatedAmount !== nb.estimatedAmount || ob.notes !== nb.notes) {
+        diffs.changedBudgetIds.add(nb.id);
+      }
+    });
+  }
+
+  if (oldPlan && Array.isArray(oldPlan.timeline)) {
+    plan.timeline.forEach(nt => {
+      const ot = oldPlan.timeline.find(t => t.id === nt.id || t.task === nt.task);
+      if (!ot || ot.offsetDaysBefore !== nt.offsetDaysBefore || ot.calculatedDate !== nt.calculatedDate || ot.details !== nt.details) {
+        diffs.changedTimelineIds.add(nt.id);
+      }
+    });
+  }
+
+  if (oldPlan && Array.isArray(oldPlan.vendors)) {
+    plan.vendors.forEach(nv => {
+      const ov = oldPlan.vendors.find(v => v.id === nv.id || v.category.toLowerCase() === nv.category.toLowerCase());
+      if (!ov || ov.status !== nv.status || ov.notes !== nv.notes || ov.estimatedRange !== nv.estimatedRange) {
+        diffs.changedVendorIds.add(nv.id);
+      }
+    });
+  }
+
+  // 1. Header & Source Badge
+  const sourceBadge = $('sourceBadgeContainer');
+  if (plan.source === 'ai') {
+    sourceBadge.innerHTML = `<span class="source-badge ai">✦ AI-Generated (${esc(MODEL)})</span>`;
+  } else if (plan.source === 'demo') {
+    sourceBadge.innerHTML = `<span class="source-badge demo">★ Realistic Demo Plan</span>`;
+  } else {
+    sourceBadge.innerHTML = `<span class="source-badge offline">⚙ Offline Template Engine</span>`;
+  }
+
+  const titleEl = $('planTitleDisplay');
+  titleEl.textContent = plan.title;
+  if (diffs.title) applyDiffHighlight(titleEl);
+
+  // Metadata tags
+  const metaContainer = $('planMetaContainer');
+  metaContainer.innerHTML = `
+    <span class="meta-tag">👥 ${esc(plan.guests)} Guests</span>
+    <span class="meta-tag">📍 ${esc(plan.location)}</span>
+    <span class="meta-tag">🏷 ${esc(plan.eventType)}</span>
+    <span class="meta-tag">🏛 ${esc(plan.indoorOutdoor)}</span>
+    <span class="meta-tag">⏳ ${esc(plan.duration)}</span>
+    <span class="meta-tag">🍽 ${esc(plan.dietary || 'Standard')}</span>
+  `;
+
+  // Cost Per Guest & Days remaining
+  const cpgBadge = $('costPerGuestBadge');
+  cpgBadge.textContent = `₹${plan.costPerGuest.toLocaleString('en-IN')}/guest`;
+  if (diffs.guests || diffs.budget) applyDiffHighlight(cpgBadge);
+
+  const dateDistEl = $('dateDistanceText');
+  if (plan.timelineDiffDays !== undefined) {
+    if (plan.isPastTimeline) {
+      dateDistEl.textContent = `Event date passed (${Math.abs(plan.timelineDiffDays)} days ago)`;
+    } else if (plan.timelineDiffDays === 0) {
+      dateDistEl.textContent = `Celebration is Today!`;
+    } else {
+      dateDistEl.textContent = `${plan.timelineDiffDays} days remaining`;
+    }
+    if (diffs.date) applyDiffHighlight(dateDistEl);
+  }
+
+  // 2. Realism / Notice Alert Banner
+  const alertArea = $('alertBannerArea');
+  alertArea.innerHTML = '';
+
+  if (plan.isPastTimeline) {
+    alertArea.innerHTML += `
+      <div class="alert-banner danger">
+        <span>⚠️ <strong>Date has passed:</strong> The specified event date (${esc(plan.date)}) is in the past. Milestones are displayed in retrospective / archive mode.</span>
+      </div>`;
+  } else if (plan.timelineSqueezedNotice) {
+    alertArea.innerHTML += `
+      <div class="alert-banner warning">
+        <span>⚡ <strong>Schedule Squeezed:</strong> ${esc(plan.timelineSqueezedNotice)}</span>
+      </div>`;
+  }
+
+  if (plan.realismWarning) {
+    alertArea.innerHTML += `
+      <div class="alert-banner warning">
+        <span>💡 ${esc(plan.realismWarning)}</span>
+      </div>`;
+  }
+
+  // 3. Executive Summary
+  $('planSummaryText').textContent = plan.summary;
+  $('planContingencyText').textContent = `🛡 ${plan.contingencyNote}`;
+
+  // 4. Budget Section
+  renderBudgetSection(plan, diffs);
+
+  // 5. Timeline Section
+  renderTimelineSection(plan, diffs);
+
+  // 6. Vendor Checklist Section
+  renderVendorSection(plan, diffs);
+
+  // 7. Ideas Section
+  renderIdeasSection(plan, diffs);
+}
+
+function applyDiffHighlight(element) {
+  if (!element) return;
+  element.classList.remove('just-updated');
+  void element.offsetWidth;
+  element.classList.add('just-updated');
+}
+
+/**
+ * Renders Deterministic Budget Breakdown, SVG Donut Chart, and Spend Inputs.
+ */
+function renderBudgetSection(plan, diffs = null) {
+  const totalPlanned = plan.budget;
+  const totalActual = plan.budgetBreakdown.reduce((s, b) => s + (Number(b.actualAmount) || 0), 0);
+  const variance = totalPlanned - totalActual;
+
+  const planEl = $('statPlannedBudget');
+  planEl.textContent = `₹${totalPlanned.toLocaleString('en-IN')}`;
+  if (diffs && diffs.budget) applyDiffHighlight(planEl);
+
+  $('statActualSpend').textContent = `₹${totalActual.toLocaleString('en-IN')}`;
+
+  const varEl = $('statBudgetVariance');
+  if (variance >= 0) {
+    varEl.textContent = `+₹${variance.toLocaleString('en-IN')} remaining`;
+    varEl.style.color = '#137333';
+  } else {
+    varEl.textContent = `-₹${Math.abs(variance).toLocaleString('en-IN')} over budget`;
+    varEl.style.color = 'var(--coral)';
+  }
+
+  // SVG Donut Chart
+  const svg = $('budgetDonutSvg');
+  svg.innerHTML = '';
+  const colors = ['#155e47', '#287d60', '#d99a26', '#e66e55', '#4b6e5e', '#793425', '#8da897'];
+
+  let accumulatedPercent = 0;
+  plan.budgetBreakdown.forEach((item, idx) => {
+    const color = colors[idx % colors.length];
+    const pct = item.percentage;
+    if (pct <= 0) return; // skip 0% in donut ring
+    const strokeDash = `${pct} ${100 - pct}`;
+    const strokeOffset = -accumulatedPercent;
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', '50');
+    circle.setAttribute('cy', '50');
+    circle.setAttribute('r', '15.91549430918954');
+    circle.setAttribute('stroke', color);
+    circle.setAttribute('stroke-dasharray', strokeDash);
+    circle.setAttribute('stroke-dashoffset', strokeOffset.toString());
+    svg.appendChild(circle);
+
+    accumulatedPercent += pct;
+  });
+
+  // Table Body
+  const tbody = $('budgetTableBody');
+  tbody.innerHTML = '';
+
+  plan.budgetBreakdown.forEach((item, idx) => {
+    const color = colors[idx % colors.length];
+    const tr = document.createElement('tr');
+    tr.id = `budget_row_${item.id}`;
+
+    const spent = Number(item.actualAmount) || 0;
+    const alloc = Number(item.estimatedAmount) || 0;
+    const pctSpent = alloc > 0 ? Math.min(100, Math.round((spent / alloc) * 100)) : (spent > 0 ? 100 : 0);
+
+    tr.innerHTML = `
+      <td>
+        <div>
+          <span class="cat-color" style="background: ${color};"></span>
+          <strong>${esc(item.category)}</strong>
+          <small style="color: var(--muted); margin-left: 4px;">(${esc(item.percentage)}%)</small>
+        </div>
+        <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px;">${esc(item.notes)}</small>
+        <div class="progress-bar-bg" title="${pctSpent}% spent">
+          <div class="progress-bar-fill" style="width: ${pctSpent}%; background: ${pctSpent > 100 ? 'var(--coral)' : color};"></div>
+        </div>
+      </td>
+      <td style="text-align: right; font-weight: 700; white-space: nowrap;">
+        ₹${item.estimatedAmount.toLocaleString('en-IN')}
+      </td>
+      <td style="text-align: right;">
+        <input
+          type="number"
+          class="actual-input"
+          value="${esc(item.actualAmount)}"
+          placeholder="0"
+          min="0"
+          data-budget-id="${esc(item.id)}"
+          aria-label="Actual spend for ${esc(item.category)}"
+        />
+      </td>
+      <td style="text-align: right; font-size: 11.5px; white-space: nowrap;">
+        ${spent === 0 ? '<span style="color: var(--muted);">₹0 spent</span>' : spent <= alloc ? '<span style="color: #137333;">✓ In budget</span>' : '<span style="color: var(--coral);">Over</span>'}
+      </td>
+    `;
+
+    if (diffs && diffs.changedBudgetIds && diffs.changedBudgetIds.has(item.id)) {
+      applyDiffHighlight(tr);
+    }
+
+    tbody.appendChild(tr);
+  });
+
+  // Normalization Note
+  const normArea = $('budgetNormalizationNoteArea');
+  if (plan.budgetNormalizationNote) {
+    normArea.innerHTML = `<small style="display: block; color: #7a4f04; background: var(--gold-light); padding: 5px 8px; border-radius: 6px; margin-top: 8px;">ℹ️ ${esc(plan.budgetNormalizationNote)}</small>`;
+  } else {
+    normArea.innerHTML = '';
+  }
+
+  // Attach actual spend listeners
+  tbody.querySelectorAll('.actual-input').forEach(input => {
+    input.addEventListener('change', e => {
+      const budgetId = e.target.getAttribute('data-budget-id');
+      const val = Math.max(0, Number(e.target.value) || 0);
+      const targetItem = plan.budgetBreakdown.find(b => b.id === budgetId);
+      if (targetItem) {
+        targetItem.actualAmount = val;
+        savePlanToStorage();
+        renderBudgetSection(plan, null);
+      }
+    });
+  });
+}
+
+/**
+ * Renders Dated Timeline with phase filtering and .ics generator.
+ */
+function renderTimelineSection(plan, diffs = null) {
+  const container = $('timelineListContainer');
+  container.innerHTML = '';
+
+  const filtered = activeTimelinePhase === 'ALL'
+    ? plan.timeline
+    : plan.timeline.filter(t => t.phase.toLowerCase() === activeTimelinePhase.toLowerCase());
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<li style="color: var(--muted); padding: 12px 0;">No milestones in this phase.</li>';
+    return;
+  }
+
+  filtered.forEach(m => {
+    const li = document.createElement('li');
+    li.className = 'timeline-item';
+    li.id = `timeline_item_${m.id}`;
+    li.innerHTML = `
+      <div class="timeline-header">
+        <span class="timeline-title">${esc(m.task)}</span>
+        <span class="timeline-date">${esc(m.calculatedDate)} (${esc(m.timeframe)})</span>
+      </div>
+      <p class="timeline-desc">${esc(m.details)}</p>
+    `;
+
+    if (diffs && diffs.changedTimelineIds && diffs.changedTimelineIds.has(m.id)) {
+      applyDiffHighlight(li);
+    }
+
+    container.appendChild(li);
+  });
+}
+
+/**
+ * Renders Vendor Diligence Cards with localStorage auto-saving.
+ */
+function renderVendorSection(plan, diffs = null) {
+  const container = $('vendorGridContainer');
+  container.innerHTML = '';
+
+  plan.vendors.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'vendor-card';
+    card.id = `vendor_card_${v.id}`;
+
+    const questionsList = (v.questionsToAsk || []).map(q => `<li>${esc(q)}</li>`).join('');
+    const redFlagsList = (v.redFlags || []).map(f => `<li>${esc(f)}</li>`).join('');
+
+    card.innerHTML = `
+      <div class="vendor-top">
+        <span class="vendor-category">${esc(v.category)}</span>
+        <span class="vendor-range">${esc(v.estimatedRange)}</span>
+      </div>
+      <p class="vendor-why">${esc(v.whyNeeded)}</p>
+      
+      <div class="vendor-details-grid">
+        <div class="vendor-details-col ask">
+          <strong>Questions to Ask</strong>
+          <ul>${questionsList}</ul>
+        </div>
+        <div class="vendor-details-col flags">
+          <strong>Red Flags to Avoid</strong>
+          <ul>${redFlagsList}</ul>
+        </div>
+      </div>
+
+      <div class="vendor-actions">
+        <select class="vendor-status-select" data-vendor-id="${esc(v.id)}" aria-label="Status for ${esc(v.category)}">
+          <option value="To contact" ${v.status === 'To contact' ? 'selected' : ''}>To Contact</option>
+          <option value="Quoted" ${v.status === 'Quoted' ? 'selected' : ''}>Quoted</option>
+          <option value="Booked" ${v.status === 'Booked' ? 'selected' : ''}>Booked ✓</option>
+        </select>
+        <input
+          type="text"
+          class="vendor-notes-input"
+          data-vendor-id="${esc(v.id)}"
+          placeholder="Vendor contact name, phone, or quotation notes…"
+          value="${esc(v.notes)}"
+          aria-label="Notes for ${esc(v.category)}"
+        />
+      </div>
+    `;
+
+    if (diffs && diffs.changedVendorIds && diffs.changedVendorIds.has(v.id)) {
+      applyDiffHighlight(card);
+    }
+
+    container.appendChild(card);
+  });
+
+  // Attach status and note listeners
+  container.querySelectorAll('.vendor-status-select').forEach(sel => {
+    sel.addEventListener('change', e => {
+      const vid = e.target.getAttribute('data-vendor-id');
+      const item = plan.vendors.find(v => v.id === vid);
+      if (item) {
+        item.status = e.target.value;
+        savePlanToStorage();
+        showToast(`Vendor status updated to ${item.status}`);
+      }
+    });
+  });
+
+  container.querySelectorAll('.vendor-notes-input').forEach(input => {
+    input.addEventListener('input', e => {
+      const vid = e.target.getAttribute('data-vendor-id');
+      const item = plan.vendors.find(v => v.id === vid);
+      if (item) {
+        item.notes = e.target.value;
+        savePlanToStorage();
+      }
+    });
+  });
+}
+
+/**
+ * Renders Categorized Personalized Ideas with category switching.
+ */
+function renderIdeasSection(plan, diffs = null) {
+  const tabs = $('ideasTabPills');
+  tabs.innerHTML = '';
+
+  const categories = [
+    { key: 'theme', label: '🎨 Theme & Vibe' },
+    { key: 'decor', label: '🌿 Decor & Lighting' },
+    { key: 'menu', label: '🍲 Food & Drinks' },
+    { key: 'activities', label: '🎉 Activities & Rituals' },
+    { key: 'returnGifts', label: '🎁 Return Gifts' },
+    { key: 'playlist', label: '🎵 Music & Sound' },
+    { key: 'accessibility', label: '♿ Accessibility & Comfort' }
+  ];
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `idea-tab-btn ${activeIdeasCategory === cat.key ? 'active' : ''}`;
+    btn.textContent = cat.label;
+    btn.addEventListener('click', () => {
+      activeIdeasCategory = cat.key;
+      renderIdeasSection(plan, null);
+    });
+    tabs.appendChild(btn);
+  });
+
+  const cardsContainer = $('ideasCardsGrid');
+  cardsContainer.innerHTML = '';
+
+  const activeList = plan.ideas[activeIdeasCategory] || [];
+  if (activeList.length === 0) {
+    cardsContainer.innerHTML = '<div style="color: var(--muted); padding: 12px;">No specific ideas in this category yet.</div>';
+    return;
+  }
+
+  activeList.forEach((ideaText, i) => {
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.innerHTML = `
+      <small>Concept ${i + 1}</small>
+      <div>${esc(ideaText)}</div>
+    `;
+
+    if (diffs && diffs.ideasChanged) {
+      applyDiffHighlight(card);
+    }
+
+    cardsContainer.appendChild(card);
+  });
+}
+
+// ==========================================
+// 9. SECURITY VALIDATION, STORAGE & EXPORT
+// ==========================================
+/**
+ * Strict schema validator & sanitizer for data loaded from URL hash or localStorage.
+ * Rejects invalid types, strings exceeding length limits, or out-of-bounds enums.
+ */
+function sanitizeAndValidatePlan(p) {
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return null;
+
+  const allowedTypes = ['Wedding', 'Birthday', 'Community', 'Anniversary', 'Other'];
+  if (!allowedTypes.includes(p.eventType)) return null;
+
+  if (typeof p.title !== 'string' || p.title.trim().length === 0 || p.title.length > 150) return null;
+  if (typeof p.summary !== 'string' || p.summary.length > 2000) return null;
+  if (p.contingencyNote && (typeof p.contingencyNote !== 'string' || p.contingencyNote.length > 1000)) return null;
+  if (typeof p.location !== 'string' || p.location.length > 150) return null;
+
+  const guests = Number(p.guests);
+  if (!Number.isFinite(guests) || guests < 1 || guests > 100000) return null;
+
+  const budget = Number(p.budget);
+  if (!Number.isFinite(budget) || budget < 0 || budget > 10000000000) return null;
+
+  if (typeof p.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(p.date) || isNaN(new Date(p.date + 'T12:00:00').getTime())) return null;
+
+  const allowedSources = ['ai', 'demo', 'offline'];
+  const source = allowedSources.includes(p.source) ? p.source : 'offline';
+
+  if (!Array.isArray(p.budgetBreakdown) || p.budgetBreakdown.length === 0 || p.budgetBreakdown.length > 30) return null;
+  const cleanBudget = [];
+  for (const b of p.budgetBreakdown) {
+    if (!b || typeof b !== 'object') return null;
+    if (typeof b.category !== 'string' || b.category.trim().length === 0 || b.category.length > 100) return null;
+    const pct = Number(b.percentage);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) return null;
+    const est = Number(b.estimatedAmount);
+    if (!Number.isFinite(est) || est < 0) return null;
+    const act = Number(b.actualAmount);
+    if (!Number.isFinite(act) || act < 0) return null;
+    cleanBudget.push({
+      id: typeof b.id === 'string' && b.id.length < 50 ? b.id : `b_${cleanBudget.length + 1}`,
+      category: b.category.trim(),
+      percentage: pct,
+      estimatedAmount: Math.round(est),
+      actualAmount: Math.round(act),
+      notes: typeof b.notes === 'string' ? b.notes.slice(0, 400) : ''
+    });
+  }
+
+  if (!Array.isArray(p.timeline) || p.timeline.length > 40) return null;
+  const allowedPhases = ['Plan', 'Book', 'Confirm', 'Event day'];
+  const cleanTimeline = [];
+  for (const t of p.timeline) {
+    if (!t || typeof t !== 'object') return null;
+    if (typeof t.task !== 'string' || t.task.trim().length === 0 || t.task.length > 200) return null;
+    if (!allowedPhases.includes(t.phase)) return null;
+    const offset = Number(t.offsetDaysBefore);
+    if (!Number.isFinite(offset) || offset < 0 || offset > 5000) return null;
+    cleanTimeline.push({
+      id: typeof t.id === 'string' && t.id.length < 50 ? t.id : `t_${cleanTimeline.length + 1}`,
+      phase: t.phase,
+      offsetDaysBefore: Math.round(offset),
+      idealOffset: Number.isFinite(Number(t.idealOffset)) ? Number(t.idealOffset) : Math.round(offset),
+      calculatedDate: typeof t.calculatedDate === 'string' ? t.calculatedDate.slice(0, 40) : '',
+      timeframe: typeof t.timeframe === 'string' ? t.timeframe.slice(0, 60) : '',
+      task: t.task.trim(),
+      details: typeof t.details === 'string' ? t.details.slice(0, 600) : ''
+    });
+  }
+
+  if (!Array.isArray(p.vendors) || p.vendors.length > 40) return null;
+  const allowedStatuses = ['To contact', 'Quoted', 'Booked'];
+  const cleanVendors = [];
+  for (const v of p.vendors) {
+    if (!v || typeof v !== 'object') return null;
+    if (typeof v.category !== 'string' || v.category.trim().length === 0 || v.category.length > 100) return null;
+    cleanVendors.push({
+      id: typeof v.id === 'string' && v.id.length < 50 ? v.id : `v_${cleanVendors.length + 1}`,
+      category: v.category.trim(),
+      whyNeeded: typeof v.whyNeeded === 'string' ? v.whyNeeded.slice(0, 400) : '',
+      estimatedRange: typeof v.estimatedRange === 'string' ? v.estimatedRange.slice(0, 150) : '',
+      questionsToAsk: Array.isArray(v.questionsToAsk) ? v.questionsToAsk.filter(q => typeof q === 'string').map(q => q.slice(0, 250)).slice(0, 8) : [],
+      redFlags: Array.isArray(v.redFlags) ? v.redFlags.filter(f => typeof f === 'string').map(f => f.slice(0, 250)).slice(0, 8) : [],
+      status: allowedStatuses.includes(v.status) ? v.status : 'To contact',
+      notes: typeof v.notes === 'string' ? v.notes.slice(0, 600) : ''
+    });
+  }
+
+  if (!p.ideas || typeof p.ideas !== 'object' || Array.isArray(p.ideas)) return null;
+  const allowedIdeaKeys = ['theme', 'decor', 'menu', 'activities', 'returnGifts', 'playlist', 'accessibility'];
+  const cleanIdeas = {};
+  for (const k of allowedIdeaKeys) {
+    cleanIdeas[k] = Array.isArray(p.ideas[k]) ? p.ideas[k].filter(i => typeof i === 'string').map(i => i.slice(0, 300)).slice(0, 15) : [];
+  }
+
+  const timelineData = generateRealTimeline(p.date, p.eventType, cleanTimeline);
+
+  return {
+    id: typeof p.id === 'string' && p.id.length < 50 ? p.id : `plan_${Date.now()}`,
+    source: source,
+    title: p.title.trim(),
+    eventType: p.eventType,
+    eventSubType: typeof p.eventSubType === 'string' ? p.eventSubType.slice(0, 150) : '',
+    culturalStyle: typeof p.culturalStyle === 'string' ? p.culturalStyle.slice(0, 150) : '',
+    guests: guests,
+    budget: budget,
+    date: p.date,
+    location: p.location.trim(),
+    venueBooked: Boolean(p.venueBooked),
+    duration: typeof p.duration === 'string' ? p.duration.slice(0, 80) : 'Evening (4-5 hours)',
+    indoorOutdoor: typeof p.indoorOutdoor === 'string' ? p.indoorOutdoor.slice(0, 80) : 'Outdoor Lawn / Terrace',
+    dietary: typeof p.dietary === 'string' ? p.dietary.slice(0, 300) : '',
+    priorities: Array.isArray(p.priorities) ? p.priorities.filter(pr => typeof pr === 'string').map(pr => pr.slice(0, 100)) : [],
+    costPerGuest: Math.round(budget / (guests || 1)),
+    realismWarning: typeof p.realismWarning === 'string' ? p.realismWarning.slice(0, 500) : null,
+    summary: p.summary,
+    contingencyNote: p.contingencyNote || '',
+    budgetBreakdown: cleanBudget,
+    budgetNormalizationNote: typeof p.budgetNormalizationNote === 'string' ? p.budgetNormalizationNote : null,
+    timeline: timelineData.milestones,
+    isPastTimeline: timelineData.isPast,
+    isRushTimeline: timelineData.isRush,
+    timelineDiffDays: timelineData.diffDays,
+    timelineSqueezedNotice: timelineData.squeezedNotice,
+    vendors: cleanVendors,
+    ideas: cleanIdeas,
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function savePlanToStorage() {
+  if (currentPlan) {
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEY_PLAN, JSON.stringify(currentPlan));
+    } catch(e) {}
+  }
+}
+
+function loadPlanFromStorage() {
+  const saved = localStorage.getItem(CONFIG.STORAGE_KEY_PLAN);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      const validated = sanitizeAndValidatePlan(parsed);
+      if (validated) {
+        currentPlan = validated;
+        renderPlan(currentPlan, null);
+        return true;
+      }
+    } catch (e) {}
+  }
+  return false;
+}
+
+function checkSharedPlanInHash() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#plan=')) {
+    try {
+      const jsonStr = decodeURIComponent(hash.substring(6));
+      const parsed = JSON.parse(jsonStr);
+      const validated = sanitizeAndValidatePlan(parsed);
+      if (validated) {
+        currentPlan = validated;
+        syncFormInputs(currentPlan);
+        renderPlan(currentPlan, null);
+        showToast('Shared plan loaded successfully!');
+        return true;
+      } else {
+        showToast('Security alert: Shared plan failed schema validation and was rejected.');
+      }
+    } catch (e) {
+      showToast('Security alert: Malformed share link rejected.');
+    }
+  }
+  return false;
+}
+
+function downloadICS(plan) {
+  if (!plan || !plan.timeline || plan.timeline.length === 0) {
+    showToast('No milestones available to export.');
+    return;
+  }
+
+  let icsLines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Gatherly//Event Planning Assistant//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH'
+  ];
+
+  plan.timeline.forEach((m, idx) => {
+    const rawDate = m.calculatedDate ? new Date(m.calculatedDate) : new Date();
+    const dtStr = rawDate.toISOString().replace(/[-:]/g, '').split('T')[0];
+
+    icsLines.push('BEGIN:VEVENT');
+    icsLines.push(`UID:gatherly_${plan.id}_${idx}@gatherly.app`);
+    icsLines.push(`DTSTAMP:${dtStr}T090000Z`);
+    icsLines.push(`DTSTART;VALUE=DATE:${dtStr}`);
+    icsLines.push(`SUMMARY:[Gatherly] ${cleanIcsText(m.task)}`);
+    icsLines.push(`DESCRIPTION:${cleanIcsText(m.details + ' (Phase: ' + m.phase + ')')}`);
+    icsLines.push('STATUS:CONFIRMED');
+    icsLines.push('END:VEVENT');
+  });
+
+  icsLines.push('END:VCALENDAR');
+  const blob = new Blob([icsLines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  triggerFileDownload(blob, `${slugify(plan.title)}-milestones.ics`);
+  showToast('Calendar .ics file downloaded!');
+}
+
+function downloadJSON(plan) {
+  if (!plan) return;
+  const jsonStr = JSON.stringify(plan, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  triggerFileDownload(blob, `${slugify(plan.title)}-state.json`);
+  showToast('Plan JSON state exported!');
+}
+
+function copyCleanText(plan) {
+  if (!plan) return;
+  let text = `========================================\n`;
+  text += `${plan.title.toUpperCase()}\n`;
+  text += `Event: ${plan.eventType} | Guests: ${plan.guests} | Budget: ₹${plan.budget.toLocaleString('en-IN')}\n`;
+  text += `Date: ${plan.date} | Location: ${plan.location}\n`;
+  text += `Cost per Guest: ₹${plan.costPerGuest.toLocaleString('en-IN')}\n`;
+  text += `========================================\n\n`;
+  text += `STRATEGIC OVERVIEW:\n${plan.summary}\n${plan.contingencyNote}\n\n`;
+
+  text += `DETERMINISTIC BUDGET BREAKDOWN:\n`;
+  plan.budgetBreakdown.forEach(b => {
+    text += `- ${b.category.padEnd(30, ' ')}: ₹${b.estimatedAmount.toLocaleString('en-IN')} (${b.percentage}%)\n`;
+  });
+  text += `\nKEY TIMELINE MILESTONES:\n`;
+  plan.timeline.forEach(t => {
+    text += `- [${t.calculatedDate}] ${t.task} (${t.phase}) - ${t.details}\n`;
+  });
+  text += `\nVENDOR DILIGENCE CHECKLIST:\n`;
+  plan.vendors.forEach(v => {
+    text += `- ${v.category} [${v.status}]: Est ${v.estimatedRange}\n`;
+    if (v.notes) text += `  Notes: ${v.notes}\n`;
+  });
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Clean text summary copied to clipboard!');
+    }).catch(() => {
+      showToast('Failed to copy. Please allow clipboard permissions.');
+    });
+  }
+}
+
+function generateShareLink(plan) {
+  if (!plan) return;
+  try {
+    const minified = JSON.stringify(plan);
+    const encoded = encodeURIComponent(minified);
+    const shareUrl = `${window.location.origin}${window.location.pathname}#plan=${encoded}`;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast('Sharable link copied to clipboard!');
+      });
+    }
+  } catch (e) {
+    showToast('Failed to generate share link.');
+  }
+}
+
+function loadDemoPlan(key) {
+  const demo = DEMO_PLANS[key] || DEMO_PLANS.birthday;
+  const oldPlan = currentPlan ? JSON.parse(JSON.stringify(currentPlan)) : null;
+  currentPlan = JSON.parse(JSON.stringify(demo));
+  syncFormInputs(currentPlan);
+  savePlanToStorage();
+  renderPlan(currentPlan, oldPlan);
+  showToast(`Loaded ${currentPlan.title}`);
+}
+
+// ==========================================
+// 10. DOM HOOKS & EVENT LISTENERS
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const defaultDate = new Date(Date.now() + 45 * 86400000).toISOString().split('T')[0];
+  $('date').value = defaultDate;
+
+  $('currentModelBadge').textContent = `Model: ${MODEL}`;
+  $('apiKeyInput').value = API_KEY;
+  $('modelNameInput').value = MODEL;
+
+  // Form Submit
+  $('eventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('generatePlanBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Designing your plan…</span>';
+
+    const priorities = [];
+    document.querySelectorAll('input[name="priority"]:checked').forEach(cb => priorities.push(cb.value));
+
+    const userInput = {
+      eventType: $('eventType').value,
+      eventSubType: $('eventSubType').value.trim(),
+      guests: $('guests').value,
+      budget: $('budget').value,
+      date: $('date').value,
+      location: $('location').value.trim(),
+      vibe: $('vibe').value.trim(),
+      culturalStyle: $('culturalStyle').value.trim(),
+      dietary: $('dietary').value.trim(),
+      indoorOutdoor: $('indoorOutdoor').value,
+      duration: $('duration').value,
+      venueBooked: $('venueBooked').checked,
+      priorities: priorities
+    };
+
+    const oldPlan = currentPlan ? JSON.parse(JSON.stringify(currentPlan)) : null;
+
+    try {
+      currentPlan = await generatePlanFromInput(userInput);
+      savePlanToStorage();
+      renderPlan(currentPlan, oldPlan);
+      showToast('Plan created successfully!');
+    } catch (err) {
+      showToast(`Error (${MODEL}): ${err.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Generate Plan ✦</span>';
+    }
+  });
+
+  // Chat Form Submit
+  $('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = $('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    await processChatRefinement(msg);
+  });
+
+  // Quick Prompt Chips
+  document.querySelectorAll('.prompt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.getAttribute('data-prompt');
+      $('chatInput').value = prompt;
+      $('chatForm').dispatchEvent(new Event('submit'));
+    });
+  });
+
+  // Demo Chips in Hero
+  document.querySelectorAll('.demo-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const demoKey = chip.getAttribute('data-demo');
+      loadDemoPlan(demoKey);
+    });
+  });
+  $('quickDemoBtn').addEventListener('click', () => loadDemoPlan('birthday'));
+
+  // Timeline Phase Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTimelinePhase = btn.getAttribute('data-phase');
+      if (currentPlan) renderTimelineSection(currentPlan, null);
+    });
+  });
+
+  // Action Buttons
+  $('downloadIcsBtn').addEventListener('click', () => downloadICS(currentPlan));
+  $('downloadJsonBtn').addEventListener('click', () => downloadJSON(currentPlan));
+  $('copyCleanTextBtn').addEventListener('click', () => copyCleanText(currentPlan));
+  $('printPlanBtn').addEventListener('click', () => window.print());
+  $('shareLinkBtn').addEventListener('click', () => generateShareLink(currentPlan));
+
+  // Regenerate Ideas Section
+  $('regenerateIdeasBtn').addEventListener('click', async () => {
+    if (!currentPlan) return;
+    const btn = $('regenerateIdeasBtn');
+    btn.textContent = 'Refreshing…';
+
+    const oldPlan = JSON.parse(JSON.stringify(currentPlan));
+
+    if (API_KEY) {
+      try {
+        const prompt = `Provide 7 fresh creative concepts for each of the categories: theme, decor, menu, activities, returnGifts, playlist, accessibility.
+Occasion: ${currentPlan.eventType} (${currentPlan.eventSubType}), Vibe: ${currentPlan.vibe}, Dietary: ${currentPlan.dietary}, Cultural: ${currentPlan.culturalStyle}.
+Return valid JSON matching schema.`;
+        const res = await callGeminiAPI("You are an expert event designer. Return JSON only.", prompt);
+        if (res && res.ideas) {
+          currentPlan.ideas = res.ideas;
+          savePlanToStorage();
+          renderIdeasSection(currentPlan, { ideasChanged: true });
+          showToast('Fresh creative concepts generated!');
+        }
+      } catch (e) {
+        showToast(`Idea refresh failed (${MODEL}): keeping existing ideas.`);
+      } finally {
+        btn.textContent = '✦ Refresh Ideas';
+      }
+    } else {
+      currentPlan.ideas.theme.reverse();
+      currentPlan.ideas.decor.reverse();
+      currentPlan.ideas.menu.reverse();
+      savePlanToStorage();
+      renderIdeasSection(currentPlan, { ideasChanged: true });
+      btn.textContent = '✦ Refresh Ideas';
+      showToast('Ideas reorganized! (Add Gemini API key for all-new AI ideas)');
+    }
+  });
+
+  // Settings Modal Controls
+  const modal = $('settingsModal');
+  $('openSettingsBtn').addEventListener('click', () => modal.classList.add('open'));
+  $('closeSettingsBtn').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  $('saveSettingsBtn').addEventListener('click', () => {
+    API_KEY = $('apiKeyInput').value.trim();
+    MODEL = $('modelNameInput').value.trim() || CONFIG.DEFAULT_MODEL;
+
+    localStorage.setItem(CONFIG.STORAGE_KEY_API_KEY, API_KEY);
+    localStorage.setItem(CONFIG.STORAGE_KEY_MODEL, MODEL);
+
+    $('currentModelBadge').textContent = `Model: ${MODEL}`;
+    modal.classList.remove('open');
+    showToast(`Saved settings! Model: ${MODEL}`);
+  });
+
+  $('clearKeyBtn').addEventListener('click', () => {
+    API_KEY = '';
+    localStorage.removeItem(CONFIG.STORAGE_KEY_API_KEY);
+    $('apiKeyInput').value = '';
+    showToast('API Key removed.');
+  });
+
+  // Test Connection Button
+  $('testConnectionBtn').addEventListener('click', async () => {
+    const key = $('apiKeyInput').value.trim() || API_KEY;
+    const modelToTest = $('modelNameInput').value.trim() || MODEL;
+    if (!key) {
+      showToast(`[${modelToTest}] Please paste an API key first.`);
+      return;
+    }
+    const btn = $('testConnectionBtn');
+    btn.disabled = true;
+    btn.textContent = 'Testing…';
+
+    try {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelToTest)}:generateContent`;
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': key
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: 'Respond with OK.' }] }]
+        })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        let parsed = {};
+        try { parsed = JSON.parse(errText); } catch(e){}
+        throw new Error(parsed.error?.message || `Status ${res.status}`);
+      }
+      showToast(`[${modelToTest}] Connection successful!`);
+    } catch (err) {
+      showToast(`[${modelToTest}] Connection failed: ${err.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Test Connection';
+    }
+  });
+
+  // Check URL hash or load saved plan
+  const loadedFromHash = checkSharedPlanInHash();
+  if (!loadedFromHash) {
+    const loadedFromStorage = loadPlanFromStorage();
+    if (!loadedFromStorage) {
+      $('emptyState').style.display = 'flex';
+      $('planContent').style.display = 'none';
+    }
+  }
+});
+
+// ==========================================
+// 11. HELPER UTILITIES
+// ==========================================
+function $(id) {
+  return document.getElementById(id);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>'"]/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[c]));
+}
+
+function formatDate(d) {
+  if (!d || isNaN(d.getTime())) return 'TBD';
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function getRelativeDateString(daysFromNow) {
+  const d = new Date(Date.now() + daysFromNow * 86400000);
+  return d.toISOString().split('T')[0];
+}
+
+function slugify(text) {
+  return (text || 'gatherly-plan')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function cleanIcsText(str) {
+  return (str || '')
+    .replace(/\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function triggerFileDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function showToast(msg) {
+  const toast = $('toastMessage');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+function setChatStatus(status) {
+  $('chatStatusBadge').textContent = status;
+}
+
+function appendChatMessage(role, text) {
+  const stream = $('chatMessagesStream');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.textContent = text;
+  stream.appendChild(div);
+  stream.scrollTop = stream.scrollHeight;
+}
+</script>
+</body>
+</html>
